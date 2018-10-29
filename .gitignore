@@ -30,3 +30,8 @@
 *.exe
 *.out
 *.app
+
+#QT
+*.pro.user
+*.user
+*.c39
