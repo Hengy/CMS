@@ -3,6 +3,8 @@
 
 #pragma once
 
+//Mark was here
+
 // generic linked list
 typedef struct node {
     void *data;
