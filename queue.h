@@ -3,17 +3,6 @@
 
 #pragma once
 
-// message struct
-typedef struct message {
-    char * mBuf;
-    short sid;
-    short rid;
-    unsigned char priority;
-    short seq;
-    unsigned char * unknown;
-    struct message * next;
-} Message;
-
 // generic linked list
 typedef struct node {
     void *data;
@@ -33,7 +22,10 @@ void qPushToEnd(Queue * q, void *newData, size_t dataSize);
 void qPushToStart(Queue * q, void *newData, size_t dataSize);
 Link * qPopEnd(Queue * q);
 Link * qPopStart(Queue * q);
+Link * qTraverseHelper(Link * n, int i, int j);
+Link * qTraverse(Queue * q, int j);
+void qPrintNode(Link * n, void (*fp)(void *));
 void qPrintHelper(Link * n, void (*fp)(void *));
-void qPrint(Link * n, void (*fp)(void *));
+void qPrintList(Link * n, void (*fp)(void *));
 
 #endif // QUEUE_H

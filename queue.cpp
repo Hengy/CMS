@@ -77,7 +77,7 @@ Link * qTraverseHelper(Link * n, int i, int j) {
 }
 
 // traverse list and return node
-Link * qTraverse(Queue * q) {
+Link * qTraverse(Queue * q, int j) {
     struct node * temp = new Link;
     int i = 0;
     temp = qTraverseHelper(q->head, i, j);
@@ -90,7 +90,9 @@ void qPrintNode(Link * n, void (*fp)(void *)) {
 
 // print queue helper
 void qPrintHelper(Link * n, void (*fp)(void *)) {
-    qPrintHelper(n->next, (*fp));
+    if (n->next != NULL) {
+        qPrintHelper(n->next, (*fp));
+    }
 }
 
 // print queue
