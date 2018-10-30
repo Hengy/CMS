@@ -33,7 +33,8 @@ SOURCES += \
 HEADERS += \
         mainwindow.h \
     sound.h \
-    globals.h
+    globals.h \
+    queue.h
 
 FORMS += \
         mainwindow.ui
