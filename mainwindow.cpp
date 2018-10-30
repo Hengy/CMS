@@ -86,11 +86,11 @@ void MainWindow::startRecording()
                 errBox.setInformativeText("Error recording!");
                 errBox.exec();
             } else {
-                ui->recSign->setText(QString("IDLE"));
-                ui->recSign->repaint();
-
                 CloseRecording();
             }
+
+            ui->recSign->setText(QString("IDLE"));
+            ui->recSign->repaint();
 
         }
 

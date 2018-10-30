@@ -45,7 +45,7 @@ int	InitializePlayback(void)
 	// open the playback device
 	rc = waveOutOpen(&HWaveOut, WAVE_MAPPER, &WaveFormat, (DWORD)NULL, 0, CALLBACK_NULL);
 	if (rc) {
-        //printf("Unable to open Output sound Device! Error %x.", rc);
+        printf("Unable to open Output sound Device! Error %x.", rc);
 		return(0);
 	}
 	return(1);
@@ -81,7 +81,7 @@ int PlayBuffer(short *piBuf, long lSamples)
 	WaveHeader.dwBufferLength = lSamples * sizeof(short);
 	rc = waveOutPrepareHeader(HWaveOut, &WaveHeader, sizeof(WAVEHDR));
 	if (rc) {
-        //printf("Failed preparing WAVEHDR, error 0x%x.", rc);
+        printf("Failed preparing WAVEHDR, error 0x%x.", rc);
 		return(0);
 	}
 	WaveHeader.dwFlags &= ~(WHDR_BEGINLOOP | WHDR_ENDLOOP);
@@ -133,7 +133,7 @@ int InitializeRecording(void)
 	// open the recording device
 	rc = waveInOpen(&HWaveIn, WAVE_MAPPER, &WaveFormat, (DWORD)NULL, 0, CALLBACK_NULL);
 	if (rc) {
-        //printf("Unable to open Input sound Device! Error %x.", rc);
+        printf("Unable to open Input sound Device! Error %x.", rc);
 		return(0);
 	}
 
@@ -142,7 +142,7 @@ int InitializeRecording(void)
 	WaveHeaderIn.dwBufferLength = lBigBufSize * sizeof(short);
 	rc = waveInPrepareHeader(HWaveIn, &WaveHeaderIn, sizeof(WAVEHDR));
 	if (rc) {
-        //printf("Failed preparing input WAVEHDR, error 0x%x.", rc);
+        printf("Failed preparing input WAVEHDR, error 0x%x.", rc);
 		return(0);
 	}
 
@@ -167,7 +167,7 @@ int	RecordBuffer(short *piBuf, long lBufSize)
 	WaveHeader.dwBufferLength = lBufSize * sizeof(short);
 	rc = waveInPrepareHeader(HWaveIn, &WaveHeader, sizeof(WAVEHDR));
 	if (rc) {
-        //printf("Failed preparing WAVEHDR, error 0x%x.", rc);
+        printf("Failed preparing WAVEHDR, error 0x%x.", rc);
 		return(0);
 	}
 	WaveHeader.dwFlags &= ~(WHDR_BEGINLOOP | WHDR_ENDLOOP);
