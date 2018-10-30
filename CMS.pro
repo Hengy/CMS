@@ -27,7 +27,8 @@ CONFIG += c++11
 SOURCES += \
         main.cpp \
         mainwindow.cpp \
-    sound.cpp
+    sound.cpp \
+    queue.cpp
 
 HEADERS += \
         mainwindow.h \
