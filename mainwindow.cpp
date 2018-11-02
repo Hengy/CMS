@@ -1,18 +1,21 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "globals.h"
+#include "L2L.h"
+#include <cstring>
 
 #include "sound.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::MainWindow)
+    ui(new Ui::MainWindow),
+    m_serial(new QSerialPort(this))
 {
     ui->setupUi(this);
 
     // set defaults
-    recSec = 5;
-    ui->recLenSlider->setValue(5);
+    recSec = 1;
+    ui->recLenSlider->setValue(1);
     bitrate = 16;
     sampleRate = 8;
 
@@ -21,6 +24,16 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setTab->setEnabled(false);
     ui->radioHome->setChecked(false);
     ui->radioRec->setChecked(true);
+
+    // get available COM ports and select the first one
+    const auto infos = QSerialPortInfo::availablePorts();
+    for (const QSerialPortInfo &info : infos)
+            ui->serialPortDropbox->addItem(info.portName());
+    if (ui->serialPortDropbox->count() > 0) {
+        ui->serialPortDropbox->setCurrentIndex(0);
+    }
+
+    sendMsgList = new LList;
 }
 
 MainWindow::~MainWindow()
@@ -92,6 +105,19 @@ void MainWindow::startRecording()
             ui->recSign->setText(QString("IDLE"));
             ui->recSign->repaint();
 
+            AudioMsg * newAMsg = new AudioMsg;
+            newAMsg->bitrate = bitrate;
+            newAMsg->samplerate = sampleRate;
+            newAMsg->bufSize = bufSize;
+            newAMsg->len = recSec;
+            //newAMsg->buf = (short *)malloc((size_t)bufSize);
+            memcpy(newAMsg->buf, iBigBuf, (size_t)bufSize);
+
+            qDebug() <<  (int)sizeof(AudioMsg);
+
+            lPushToEnd(sendMsgList, newAMsg, sizeof(AudioMsg));
+
+            ui->sendRecList->addItem(QString(text));
         }
 
         switch (ret) {
@@ -211,29 +237,34 @@ void MainWindow::on_actionPlay_Audio_triggered()
     startRecording();
 }
 
-void MainWindow::on_comboBox_2_currentIndexChanged(int index)
+void MainWindow::on_serialPortDropbox_currentIndexChanged(int index)
 {
     switch (index) {
         case 0:
-            baudrate = 9600;
+            baudrate = 4800;
             break;
         case 1:
-            baudrate = 19200;
-            break;
-        case 2:
-            baudrate = 38400;
-            break;
-        case 3:
-            baudrate = 57600;
-            break;
-        case 4:
-            baudrate = 115200;
-            break;
-        case 5:
-            baudrate = 128000;
-            break;
-        default:
             baudrate = 9600;
             break;
+        case 2:
+            baudrate = 19200;
+            break;
+        case 3:
+            baudrate = 38400;
+            break;
+        case 4:
+            baudrate = 57600;
+            break;
+        case 5:
+            baudrate = 115200;
+            break;
+        default:
+            baudrate = 4800;
+            break;
     }
+}
+
+void MainWindow::on_bttnRecView_released()
+{
+
 }

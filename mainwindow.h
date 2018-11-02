@@ -4,6 +4,8 @@
 #include <QMainWindow>
 #include <QMessageBox>
 #include <QInputDialog>
+#include <QSerialPortInfo>
+#include <QtSerialPort>
 
 namespace Ui {
 class MainWindow;
@@ -42,7 +44,9 @@ private slots:
 
     void on_actionPlay_Audio_triggered();
 
-    void on_comboBox_2_currentIndexChanged(int index);
+    void on_serialPortDropbox_currentIndexChanged(int index);
+
+    void on_bttnRecView_released();
 
 private:
     Ui::MainWindow *ui;
@@ -50,6 +54,8 @@ private:
     void enableCtrls();
     void startRecording();
     void startPlayback();
+
+    QSerialPort *m_serial = nullptr;
 };
 
 #endif // MAINWINDOW_H

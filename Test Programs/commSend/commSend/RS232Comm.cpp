@@ -27,18 +27,18 @@ void purgePort() {
 	PurgeComm(hCom, PURGE_RXABORT | PURGE_RXCLEAR | PURGE_TXABORT | PURGE_TXCLEAR);
 }
 
-void getPortNames() {
-	unsigned long portNums[20];
-	ULONG portCount = 20;
-	unsigned long foundPortNums[20];
-	ULONG result = GetCommPorts(portNums, portCount, foundPortNums);
-
-	if (result == ERROR_SUCCESS) {
-		for (int i = 0; i < 20; i++) {
-			printf("Port: %lu", (unsigned long)portNums[i]);
-		}
-	}
-}
+//void getPortNames() {
+//	unsigned long portNums[20];
+//	unsigned long portCount = 20;
+//	unsigned long foundPortNums[20];
+//	unsigned long result = GetCommPorts(portNums, portCount, foundPortNums);
+//
+//	if (result == ERROR_SUCCESS) {
+//		for (int i = 0; i < 20; i++) {
+//			printf("Port: %lu", (unsigned long)portNums[i]);
+//		}
+//	}
+//}
 
 // Output message to port 
 void outputToPort(LPCVOID buf, DWORD szBuf) {
@@ -95,8 +95,10 @@ int inputFromPort(LPVOID buf, DWORD szBuf) {
 // Set the hCom HANDLE to point to a COM port, initialize for reading and writing, open the port and set securities
 void createPortFile() {
 	// Call the CreateFile() function 
+	LPCWSTR portName = L"COM4";
+
 	hCom = CreateFile(
-		"COM5",										// COM port number  --> If COM# is larger than 9 then use the following syntax--> "\\\\.\\COM10"
+		portName,										// COM port number  --> If COM# is larger than 9 then use the following syntax--> "\\\\.\\COM10"
 		GENERIC_READ | GENERIC_WRITE,				// Open for read and write
 		NULL,										// No sharing allowed
 		NULL,										// No security

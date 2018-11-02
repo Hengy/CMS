@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui serialport
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -28,13 +28,13 @@ SOURCES += \
         main.cpp \
         mainwindow.cpp \
     sound.cpp \
-    queue.cpp
+    L2L.cpp
 
 HEADERS += \
         mainwindow.h \
     sound.h \
     globals.h \
-    queue.h
+    L2L.h
 
 FORMS += \
         mainwindow.ui

@@ -1,4 +1,3 @@
 ﻿  RS232Comm.cpp
-  commSend.cpp
-  Generating Code...
-  commSend.vcxproj -> C:\Users\mhengeveld4331\source\repos\commSend\Debug\commSend.exe
+RS232Comm.obj : error LNK2019: unresolved external symbol __imp__GetCommPorts@12 referenced in function "void __cdecl getPortNames(void)" (?getPortNames@@YAXXZ)
+G:\ESE Conestoga\Project\Intercom\QT\CMS\Test Programs\commSend\Debug\commSend.exe : fatal error LNK1120: 1 unresolved externals
