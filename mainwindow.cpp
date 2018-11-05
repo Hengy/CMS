@@ -31,7 +31,7 @@ MainWindow::MainWindow(QWidget *parent) :
     if (ui->serialPortDropbox->count() > 0) {
         ui->serialPortDropbox->setCurrentIndex(0);
     }
-    currPort.setPortName(ports.first().portName());
+    currPort.setPortName(ui->serialPortDropbox->itemText(0));
     currPort.setBaudRate(STD_BAUDRATE);
     // ALL OTHER PARAMETERS ARE SET TO DEFAULT: No Parity, 8 bits, 1 stop bit
 
@@ -43,6 +43,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
+    closeSerialPort();
     delete ui;
 }
 
@@ -58,6 +59,13 @@ void MainWindow::openSerialPort()
     } else {
         qDebug() << "Port open error!\n";
     }
+}
+
+void MainWindow::closeSerialPort()
+{
+    if (m_serial->isOpen())
+        m_serial->close();
+    qDebug() << "Port disconnected.\n";
 }
 
 void MainWindow::disableCtrls()
@@ -275,6 +283,8 @@ void MainWindow::on_actionPlay_Audio_triggered()
 
 void MainWindow::on_baudrateDropbox_currentIndexChanged(int index)
 {
+    closeSerialPort();
+
     switch (index) {
         case 0:
             currPort.setBaudRate(4800);
@@ -305,4 +315,13 @@ void MainWindow::on_baudrateDropbox_currentIndexChanged(int index)
 void MainWindow::on_bttnRecView_released()
 {
 
+}
+
+void MainWindow::on_serialPortDropbox_currentIndexChanged(int index)
+{
+    closeSerialPort();
+
+    currPort.setPortName(ui->serialPortDropbox->itemText(index));
+
+    openSerialPort();
 }

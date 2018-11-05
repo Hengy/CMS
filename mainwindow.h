@@ -21,6 +21,7 @@ public:
 
 private slots:
     void openSerialPort();
+    void closeSerialPort();
 
     void on_radioRec_clicked();
 
@@ -51,6 +52,8 @@ private slots:
     void on_bttnRecView_released();
 
     void on_bttnAudioDel_released();
+
+    void on_serialPortDropbox_currentIndexChanged(int index);
 
 private:
     Ui::MainWindow *ui;
