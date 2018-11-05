@@ -10,8 +10,7 @@ extern short iBigBuf[];
 // audio message struct
 typedef struct audioMsg {
     char name[20];      // name of msg
-    //short * buf;        // audio buffer
-    short buf[80000];
+    short * buf;        // audio buffer
     long bufSize = 0;   // size of buffer
     int bitrate;        // bitrate of message
     int samplerate;     // samplerate of message
@@ -30,6 +29,7 @@ int audioBusy = 0;   // program busy recording or playing
 
 // COMM port
 unsigned int baudrate = 4800;
+unsigned int timeout = 1000;
 
 
 #endif // GLOBALS_H

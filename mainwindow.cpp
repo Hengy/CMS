@@ -2,8 +2,6 @@
 #include "ui_mainwindow.h"
 #include "globals.h"
 #include "L2L.h"
-#include <cstring>
-
 #include "sound.h"
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -18,6 +16,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->recLenSlider->setValue(1);
     bitrate = 16;
     sampleRate = 8;
+    ui->timeoutDropbox->setCurrentIndex(3);
 
     // disable Home station controls
     ui->sendTab->setEnabled(false);
@@ -34,6 +33,7 @@ MainWindow::MainWindow(QWidget *parent) :
     }
 
     sendMsgList = new LList;
+    lInit(sendMsgList);
 }
 
 MainWindow::~MainWindow()
@@ -110,10 +110,8 @@ void MainWindow::startRecording()
             newAMsg->samplerate = sampleRate;
             newAMsg->bufSize = bufSize;
             newAMsg->len = recSec;
-            //newAMsg->buf = (short *)malloc((size_t)bufSize);
+            newAMsg->buf = (short *)malloc((size_t)bufSize);
             memcpy(newAMsg->buf, iBigBuf, (size_t)bufSize);
-
-            qDebug() <<  (int)sizeof(AudioMsg);
 
             lPushToEnd(sendMsgList, newAMsg, sizeof(AudioMsg));
 
@@ -143,7 +141,15 @@ void MainWindow::startPlayback()
     ui->recSign->setText(QString("PLAYING"));
     ui->recSign->repaint();
 
-    PlayBuffer(iBigBuf, bufSize);	// play buffer
+    int selAMsg = ui->sendRecList->currentRow();
+
+    qDebug() << selAMsg;
+
+    Link * tempLink = lTraverse(sendMsgList, selAMsg);
+    AudioMsg * tempAMsg = (AudioMsg *)tempLink->data;
+
+    PlayBuffer(tempAMsg->buf, tempAMsg->bufSize);	// play buffer
+    //PlayBuffer(iBigBuf, bufSize);	// play buffer
 
     ui->recSign->setText(QString("IDLE"));
     ui->recSign->repaint();

@@ -2,13 +2,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <QDebug>
 
 // ---------------------------------------------------------------------------------
 // DOUBLY LINKED LIST
 // ---------------------------------------------------------------------------------
 
 // initialize list head & tail
-void lInit(LList * l, funcPointer fp) {
+void lInit(LList * l) {
 
     // create head and tail
     struct node* newHead = new Link;
@@ -23,9 +24,6 @@ void lInit(LList * l, funcPointer fp) {
     l->tail->next = NULL;   // always NULL
     l->head->prev = NULL;   // always NULL
     l->tail->prev = NULL;
-
-    // set print function
-    l->printFunc = *fp;
 }
 
 // checks if list is empty; returns 1 if empty
@@ -104,7 +102,7 @@ Link * lPopStart(LList * l) {
 
 // traverse helper
 Link * lTraverseHelper(Link * n, int i, int j) {
-    if ((i != j) || (n->next != NULL)) {
+    if ((i != j) && (n->next != NULL)) {
         return lTraverseHelper(n->next, i++, j);
     }
     return n;
@@ -115,22 +113,4 @@ Link * lTraverse(LList * l, int j) {
     struct node * temp = new Link;
     temp = lTraverseHelper(l->head, 1, j);
     return temp;
-}
-
-// print node data
-void lPrintNode(Link * n, funcPointer fp) {
-    (*fp)(n->data);
-}
-
-// print lueue helper
-void lPrintHelper(Link * n, funcPointer fp) {
-    lPrintNode(n, (*fp));
-    if (n->next != NULL) {
-        lPrintHelper(n->next, (*fp));
-    }
-}
-
-// print list
-void lPrintList(LList * l) {
-    lPrintHelper(l->head->next, l->printFunc);
 }

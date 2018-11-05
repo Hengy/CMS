@@ -110,7 +110,7 @@
     <property name="font">
      <font>
       <family>Arial Black</family>
-      <pointsize>24</pointsize>
+      <pointsize>20</pointsize>
      </font>
     </property>
     <property name="text">
@@ -531,9 +531,9 @@
    <widget class="QGroupBox" name="groupBox">
     <property name="geometry">
      <rect>
-      <x>501</x>
+      <x>391</x>
       <y>20</y>
-      <width>241</width>
+      <width>351</width>
       <height>80</height>
      </rect>
     </property>
@@ -571,7 +571,7 @@
       <rect>
        <x>90</x>
        <y>20</y>
-       <width>141</width>
+       <width>101</width>
        <height>22</height>
       </rect>
      </property>
@@ -581,7 +581,7 @@
       <rect>
        <x>90</x>
        <y>50</y>
-       <width>141</width>
+       <width>101</width>
        <height>22</height>
       </rect>
      </property>
@@ -616,11 +616,74 @@
       </property>
      </item>
     </widget>
+    <widget class="QComboBox" name="timeoutDropbox">
+     <property name="geometry">
+      <rect>
+       <x>240</x>
+       <y>50</y>
+       <width>101</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <item>
+      <property name="text">
+       <string>250</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>500</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>750</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>1000</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>1250</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>1500</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>1750</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>2000</string>
+      </property>
+     </item>
+    </widget>
+    <widget class="QLabel" name="label_11">
+     <property name="geometry">
+      <rect>
+       <x>240</x>
+       <y>25</y>
+       <width>71</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Timeout (ms)</string>
+     </property>
+    </widget>
    </widget>
    <widget class="QGroupBox" name="groupBox_2">
     <property name="geometry">
      <rect>
-      <x>270</x>
+      <x>160</x>
       <y>60</y>
       <width>211</width>
       <height>51</height>

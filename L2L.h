@@ -22,7 +22,7 @@ typedef struct lList {
 } LList;
 
 // function defintions
-void lInit(LList * l, funcPointer fp);
+void lInit(LList * l);
 int lIsEmpty(LList * l);
 void lPushToEnd(LList * l, void *newData, size_t dataSize);
 void lPushToStart(LList * l, void *newData, size_t dataSize);
@@ -30,8 +30,5 @@ Link * lPopEnd(LList * l);
 Link * lPopStart(LList * l);
 Link * lTraverseHelper(Link * n, int i, int j);
 Link * lTraverse(LList * l, int j);
-void lPrintNode(Link * n, funcPointer fp);
-void lPrintHelper(Link * n, funcPointer fp);
-void lPrintList(LList * n);
 
 #endif // L2L_H
