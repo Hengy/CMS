@@ -159,6 +159,17 @@ void MainWindow::startPlayback()
     enableCtrls();
 }
 
+void MainWindow::on_bttnAudioDel_released()
+{
+    lPopEnd(sendMsgList);
+
+    int listSize = ui->sendRecList->count();
+
+    if (listSize > 1) {
+        ui->sendRecList->takeItem(listSize-1);
+    }
+}
+
 void MainWindow::on_radioRec_clicked()
 {
     ui->sendTab->setEnabled(false);

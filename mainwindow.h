@@ -48,6 +48,8 @@ private slots:
 
     void on_bttnRecView_released();
 
+    void on_bttnAudioDel_released();
+
 private:
     Ui::MainWindow *ui;
     void disableCtrls();
