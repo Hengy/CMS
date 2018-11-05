@@ -25,12 +25,17 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->radioRec->setChecked(true);
 
     // get available COM ports and select the first one
-    const auto infos = QSerialPortInfo::availablePorts();
-    for (const QSerialPortInfo &info : infos)
+    const auto ports = QSerialPortInfo::availablePorts();
+    for (const QSerialPortInfo &info : ports)
             ui->serialPortDropbox->addItem(info.portName());
     if (ui->serialPortDropbox->count() > 0) {
         ui->serialPortDropbox->setCurrentIndex(0);
     }
+    currPort.setPortName(ports.first().portName());
+    currPort.setBaudRate(STD_BAUDRATE);
+    // ALL OTHER PARAMETERS ARE SET TO DEFAULT: No Parity, 8 bits, 1 stop bit
+
+    openSerialPort();
 
     sendMsgList = new LList;
     lInit(sendMsgList);
@@ -39,6 +44,20 @@ MainWindow::MainWindow(QWidget *parent) :
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+void MainWindow::openSerialPort()
+{
+    m_serial->setPortName(currPort.portName());
+    m_serial->setBaudRate(currPort.baudRate());
+    m_serial->setDataBits(currPort.dataBits());
+    m_serial->setParity(currPort.parity());
+    m_serial->setStopBits(currPort.stopBits());
+    if (m_serial->open(QIODevice::ReadWrite)) {
+        qDebug() << "Port open.\n";
+    } else {
+        qDebug() << "Port open error!\n";
+    }
 }
 
 void MainWindow::disableCtrls()
@@ -254,31 +273,33 @@ void MainWindow::on_actionPlay_Audio_triggered()
     startRecording();
 }
 
-void MainWindow::on_serialPortDropbox_currentIndexChanged(int index)
+void MainWindow::on_baudrateDropbox_currentIndexChanged(int index)
 {
     switch (index) {
         case 0:
-            baudrate = 4800;
+            currPort.setBaudRate(4800);
             break;
         case 1:
-            baudrate = 9600;
+            currPort.setBaudRate(9600);
             break;
         case 2:
-            baudrate = 19200;
+            currPort.setBaudRate(19200);
             break;
         case 3:
-            baudrate = 38400;
+            currPort.setBaudRate(38400);
             break;
         case 4:
-            baudrate = 57600;
+            currPort.setBaudRate(57600);
             break;
         case 5:
-            baudrate = 115200;
+            currPort.setBaudRate(115200);
             break;
         default:
-            baudrate = 4800;
+            currPort.setBaudRate(4800);
             break;
     }
+
+    openSerialPort();
 }
 
 void MainWindow::on_bttnRecView_released()

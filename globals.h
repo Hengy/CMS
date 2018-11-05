@@ -2,6 +2,11 @@
 #define GLOBALS_H
 
 #include "L2L.h"
+#include <QList>
+#include <QString>
+#include <QSerialPort>
+
+#define STD_BAUDRATE    4800
 
 extern short iBigBuf[];
 
@@ -28,8 +33,6 @@ int bufSize;         // buffer size
 int audioBusy = 0;   // program busy recording or playing
 
 // COMM port
-unsigned int baudrate = 4800;
-unsigned int timeout = 1000;
-
+QSerialPort currPort;
 
 #endif // GLOBALS_H

@@ -20,6 +20,8 @@ public:
     ~MainWindow();
 
 private slots:
+    void openSerialPort();
+
     void on_radioRec_clicked();
 
     void on_radioHome_clicked();
@@ -44,7 +46,7 @@ private slots:
 
     void on_actionPlay_Audio_triggered();
 
-    void on_serialPortDropbox_currentIndexChanged(int index);
+    void on_baudrateDropbox_currentIndexChanged(int index);
 
     void on_bttnRecView_released();
 
