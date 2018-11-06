@@ -3,6 +3,7 @@
 #include "globals.h"
 #include "L2L.h"
 #include "sound.h"
+#include <string.h>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -35,8 +36,6 @@ MainWindow::MainWindow(QWidget *parent) :
     currPort.setBaudRate(STD_BAUDRATE);
     // ALL OTHER PARAMETERS ARE SET TO DEFAULT: No Parity, 8 bits, 1 stop bit
 
-    openSerialPort();
-
     sendMsgList = new LList;
     lInit(sendMsgList);
 }
@@ -47,7 +46,7 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::openSerialPort()
+int MainWindow::openSerialPort()
 {
     m_serial->setPortName(currPort.portName());
     m_serial->setBaudRate(currPort.baudRate());
@@ -56,8 +55,10 @@ void MainWindow::openSerialPort()
     m_serial->setStopBits(currPort.stopBits());
     if (m_serial->open(QIODevice::ReadWrite)) {
         qDebug() << "Port open.\n";
+        return 1;
     } else {
         qDebug() << "Port open error!\n";
+        return 0;
     }
 }
 
@@ -93,24 +94,13 @@ void MainWindow::startRecording()
 
     QString msg = text + " will be recorded.";
 
-    QMessageBox msgBox;
-    msgBox.setText(msg);
-    msgBox.setInformativeText("Do you want to send your recording? You can also choose to just save it.");
-    msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Ok | QMessageBox::Cancel);
-    msgBox.setDefaultButton(QMessageBox::Ok);
-    msgBox.setWindowTitle("Recording");
-
     QMessageBox errBox;
     errBox.setText(msg);
     errBox.setStandardButtons(QMessageBox::Ok);
     errBox.setWindowTitle("Error!");
 
-    int ret = NULL;
-
     if (ok && !text.isEmpty()) {
         // Ok was clicked
-
-        ret = msgBox.exec();
 
         if (InitializeRecording() == 0) {
             errBox.setInformativeText("Error initializing recording!");
@@ -122,7 +112,7 @@ void MainWindow::startRecording()
 
             bufSize = recSec * (sampleRate * 1000) /2; // calculate buffer size
 
-            if (RecordBuffer(iBigBuf, bufSize) == 0) {	// record into buffer
+            if (RecordBuffer(playRecBuf, bufSize) == 0) {	// record into buffer
                 errBox.setInformativeText("Error recording!");
                 errBox.exec();
             } else {
@@ -132,26 +122,18 @@ void MainWindow::startRecording()
             ui->recSign->setText(QString("IDLE"));
             ui->recSign->repaint();
 
-            AudioMsg * newAMsg = new AudioMsg;
+            Msg * newAMsg = new Msg;
+            newAMsg->type = 0;  // audio message type
             newAMsg->bitrate = bitrate;
             newAMsg->samplerate = sampleRate;
             newAMsg->bufSize = bufSize;
             newAMsg->len = recSec;
             newAMsg->buf = (short *)malloc((size_t)bufSize);
-            memcpy(newAMsg->buf, iBigBuf, (size_t)bufSize);
+            memcpy(newAMsg->buf, playRecBuf, (size_t)bufSize);
 
-            lPushToEnd(sendMsgList, newAMsg, sizeof(AudioMsg));
+            lPushToEnd(sendMsgList, newAMsg, sizeof(Msg));
 
             ui->sendRecList->addItem(QString(text));
-        }
-
-        switch (ret) {
-            case QMessageBox::Save:
-                break;
-
-            case QMessageBox::Ok:
-            default:
-                break;
         }
 
     }
@@ -173,9 +155,9 @@ void MainWindow::startPlayback()
     qDebug() << selAMsg;
 
     Link * tempLink = lTraverse(sendMsgList, selAMsg);
-    AudioMsg * tempAMsg = (AudioMsg *)tempLink->data;
+    Msg * tempAMsg = (Msg *)tempLink->data;
 
-    PlayBuffer(tempAMsg->buf, tempAMsg->bufSize);	// play buffer
+    PlayBuffer((short *)tempAMsg->buf, tempAMsg->bufSize);	// play buffer
     //PlayBuffer(iBigBuf, bufSize);	// play buffer
 
     ui->recSign->setText(QString("IDLE"));
@@ -213,21 +195,11 @@ void MainWindow::on_radioHome_clicked()
     ui->setTab->setEnabled(true);
 }
 
-void MainWindow::on_bttnAudioRec_clicked()
-{
-
-}
-
 void MainWindow::on_recLenSlider_valueChanged(int value)
 {
     recSec = value;
     QString val = QString::number(value);
     ui->recLenLabel->setText(val);
-}
-
-void MainWindow::on_recLenSlider_sliderReleased()
-{
-
 }
 
 void MainWindow::on_recBitrateBox_currentIndexChanged(int index)
@@ -312,11 +284,6 @@ void MainWindow::on_baudrateDropbox_currentIndexChanged(int index)
     openSerialPort();
 }
 
-void MainWindow::on_bttnRecView_released()
-{
-
-}
-
 void MainWindow::on_serialPortDropbox_currentIndexChanged(int index)
 {
     closeSerialPort();
@@ -324,4 +291,41 @@ void MainWindow::on_serialPortDropbox_currentIndexChanged(int index)
     currPort.setPortName(ui->serialPortDropbox->itemText(index));
 
     openSerialPort();
+}
+
+void MainWindow::on_bttnSaveText_released()
+{
+    QString msgQText = ui->textMsg->toPlainText();
+    char * msgText;
+
+    qDebug() << msgQText.size();
+
+    memcpy(msgText, msgQText.toStdString().c_str(), 2);
+
+    /*
+    qDebug() << msgText;
+
+    int msgTextSize = msgQText.size();
+
+    qDebug() << msgText;
+
+    if (msgTextSize > 139) {
+        msgTextSize = 139;
+    }
+
+    qDebug() << msgText;
+
+    Msg * newTextMsg = new Msg;
+    newTextMsg->type = 1;  // text message type
+    newTextMsg->bitrate = 0;
+    newTextMsg->samplerate = 0;
+    newTextMsg->bufSize = bufSize;
+    newTextMsg->len = 0;
+    newTextMsg->buf = (char *)malloc((size_t)bufSize);
+    memcpy((char *)newTextMsg->buf, msgText, (size_t)msgTextSize);
+
+    lPushToEnd(sendMsgList, newTextMsg, sizeof(Msg));
+
+    ui->sendRecList->addItem((char *)newTextMsg->buf);
+    */
 }

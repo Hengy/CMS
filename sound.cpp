@@ -13,8 +13,8 @@ Details: Implementation - Contains functions for Windows sound API (sound record
 #include "sound.h"
 
 // BUFFERS
-short iBigBuf[SAMPLES_SEC * RECORD_TIME];
-long  lBigBufSize = SAMPLES_SEC * RECORD_TIME;	// total number of samples
+short playRecBuf[SAMPLES_SEC * RECORD_TIME];
+long  playRecBufSize = SAMPLES_SEC * RECORD_TIME;	// total number of samples
 
 // output and input channel parameters 
 static	int			g_nSamplesPerSec = SAMPLES_SEC;
@@ -138,8 +138,8 @@ int InitializeRecording(void)
 	}
 
 	// prepare the buffer header for use later on
-	WaveHeaderIn.lpData = (char *)iBigBuf;
-	WaveHeaderIn.dwBufferLength = lBigBufSize * sizeof(short);
+    WaveHeaderIn.lpData = (char *)playRecBuf;
+    WaveHeaderIn.dwBufferLength = playRecBufSize * sizeof(short);
 	rc = waveInPrepareHeader(HWaveIn, &WaveHeaderIn, sizeof(WAVEHDR));
 	if (rc) {
         printf("Failed preparing input WAVEHDR, error 0x%x.", rc);

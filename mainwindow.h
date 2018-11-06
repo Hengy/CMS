@@ -20,16 +20,12 @@ public:
     ~MainWindow();
 
 private slots:
-    void openSerialPort();
+    int openSerialPort();
     void closeSerialPort();
 
     void on_radioRec_clicked();
 
     void on_radioHome_clicked();
-
-    void on_bttnAudioRec_clicked();
-
-    void on_recLenSlider_sliderReleased();
 
     void on_recLenSlider_valueChanged(int value);
 
@@ -49,11 +45,11 @@ private slots:
 
     void on_baudrateDropbox_currentIndexChanged(int index);
 
-    void on_bttnRecView_released();
-
     void on_bttnAudioDel_released();
 
     void on_serialPortDropbox_currentIndexChanged(int index);
+
+    void on_bttnSaveText_released();
 
 private:
     Ui::MainWindow *ui;

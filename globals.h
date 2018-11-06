@@ -8,19 +8,20 @@
 
 #define STD_BAUDRATE    4800
 
-extern short iBigBuf[];
+extern short playRecBuf[];
 
 // audio message
 
 // audio message struct
-typedef struct audioMsg {
+typedef struct Msg {
+    unsigned char type; // type of message: (0) audio (1) text
     char name[20];      // name of msg
-    short * buf;        // audio buffer
+    void * buf;         // msg buffer
     long bufSize = 0;   // size of buffer
     int bitrate;        // bitrate of message
     int samplerate;     // samplerate of message
     int len;            // length of message (in seconds)
-} AudioMsg;
+} Msg;
 
 LList * sendMsgList;
 
