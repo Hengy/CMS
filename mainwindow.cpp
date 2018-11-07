@@ -296,36 +296,29 @@ void MainWindow::on_serialPortDropbox_currentIndexChanged(int index)
 void MainWindow::on_bttnSaveText_released()
 {
     QString msgQText = ui->textMsg->toPlainText();
-    char * msgText;
+    size_t textSize = (size_t)msgQText.size();
+    unsigned char * msgText = (unsigned char *)malloc(textSize);
 
-    qDebug() << msgQText.size();
+    memcpy(msgText, msgQText.toLocal8Bit().data(), textSize);
 
-    memcpy(msgText, msgQText.toStdString().c_str(), 2);
-
-    /*
-    qDebug() << msgText;
-
-    int msgTextSize = msgQText.size();
-
-    qDebug() << msgText;
-
-    if (msgTextSize > 139) {
-        msgTextSize = 139;
+    if (textSize > 139) {
+        textSize = 139;
     }
 
-    qDebug() << msgText;
+    if (textSize > 0) {
+        Msg * newTextMsg = new Msg;
+        newTextMsg->type = 1;  // text message type
+        newTextMsg->bitrate = 0;
+        newTextMsg->samplerate = 0;
+        newTextMsg->bufSize = (int)textSize;
+        newTextMsg->len = 0;
+        newTextMsg->buf = (char *)malloc(textSize);
+        memcpy((char *)newTextMsg->buf, (char *)msgText, textSize);
 
-    Msg * newTextMsg = new Msg;
-    newTextMsg->type = 1;  // text message type
-    newTextMsg->bitrate = 0;
-    newTextMsg->samplerate = 0;
-    newTextMsg->bufSize = bufSize;
-    newTextMsg->len = 0;
-    newTextMsg->buf = (char *)malloc((size_t)bufSize);
-    memcpy((char *)newTextMsg->buf, msgText, (size_t)msgTextSize);
+        lPushToEnd(sendMsgList, newTextMsg, sizeof(Msg));
 
-    lPushToEnd(sendMsgList, newTextMsg, sizeof(Msg));
+        ui->sendRecList->addItem((char *)newTextMsg->buf);
 
-    ui->sendRecList->addItem((char *)newTextMsg->buf);
-    */
+        ui->textMsg->clear();
+    }
 }
