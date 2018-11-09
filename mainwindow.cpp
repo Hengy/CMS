@@ -10,6 +10,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow),
     m_serial(new QSerialPort(this))
 {
+    connect(m_serial, &QSerialPort::readyRead, this, &MainWindow::readData);
+
     ui->setupUi(this);
 
     // set defaults
@@ -59,6 +61,31 @@ int MainWindow::openSerialPort()
     } else {
         qDebug() << "Port open error!\n";
         return 0;
+    }
+}
+
+void MainWindow::writeData(char * data, int n)
+{
+    QByteArray sendData;
+    sendData.setRawData(data,(unsigned int)n);
+    m_serial->write(data);
+}
+
+const char * MainWindow::readData()
+{
+    m_serial->waitForReadyRead(200);
+    const QByteArray data = m_serial->readAll();
+    if (data.size() > 0) {
+        qDebug() << "New serial data: "  << data;
+
+        QString str = QString(data);
+        if (str.contains("0x6F8C32E90A")) {
+            qDebug() << "TEST SUCCESSFUL!";
+        }
+
+        return data.data();
+    } else {
+        return NULL;
     }
 }
 
@@ -150,9 +177,9 @@ void MainWindow::startPlayback()
     ui->recSign->setText(QString("PLAYING"));
     ui->recSign->repaint();
 
-    int selAMsg = ui->sendRecList->currentRow();
+    int selAMsg = ui->sendRecList->currentRow()-1;
 
-    qDebug() << selAMsg;
+    //qDebug() << selAMsg;
 
     Link * tempLink = lTraverse(sendMsgList, selAMsg);
     Msg * tempAMsg = (Msg *)tempLink->data;
@@ -297,12 +324,18 @@ void MainWindow::on_bttnSaveText_released()
 {
     QString msgQText = ui->textMsg->toPlainText();
     size_t textSize = (size_t)msgQText.size();
+
+    if (textSize > 139) {
+        textSize = 139;
+    }
+
     unsigned char * msgText = (unsigned char *)malloc(textSize);
 
     memcpy(msgText, msgQText.toLocal8Bit().data(), textSize);
 
-    if (textSize > 139) {
-        textSize = 139;
+    char * p = (char *)msgText;
+    for (int n = 0; n<textSize; n++) {
+        qDebug() << *(p++);
     }
 
     if (textSize > 0) {
@@ -321,4 +354,27 @@ void MainWindow::on_bttnSaveText_released()
 
         ui->textMsg->clear();
     }
+}
+
+void MainWindow::on_bttnSendMsg_released()
+{
+    int selAMsg = ui->sendRecList->currentRow()-1;
+
+    //qDebug() << selAMsg;
+
+    Link * tempLink = lTraverse(sendMsgList, selAMsg);
+    Msg * tempMsg = (Msg *)tempLink->data;
+
+    writeData((char *)tempMsg->buf, tempMsg->bufSize);
+}
+
+void MainWindow::on_sendRecList_currentRowChanged(int currentRow)
+{
+    qDebug() << currentRow;
+}
+
+void MainWindow::on_actionTest_1_triggered()
+{
+    char testStr[13] = "0x6F8C32E90A";
+    writeData(testStr, 13);
 }

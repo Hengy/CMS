@@ -20,6 +20,8 @@ public:
     ~MainWindow();
 
 private slots:
+    void writeData(char * data, int n);
+    const char * readData();
     int openSerialPort();
     void closeSerialPort();
 
@@ -50,6 +52,12 @@ private slots:
     void on_serialPortDropbox_currentIndexChanged(int index);
 
     void on_bttnSaveText_released();
+
+    void on_bttnSendMsg_released();
+
+    void on_sendRecList_currentRowChanged(int currentRow);
+
+    void on_actionTest_1_triggered();
 
 private:
     Ui::MainWindow *ui;
