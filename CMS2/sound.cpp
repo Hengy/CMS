@@ -13,12 +13,12 @@ Details: Implementation - Contains functions for Windows sound API (sound record
 #include "sound.h"
 
 // BUFFERS
-short playRecBuf[SAMPLES_SEC * RECORD_TIME];
+short playRecBuf[160000];
 long  playRecBufSize = SAMPLES_SEC * RECORD_TIME;	// total number of samples
 
 // output and input channel parameters 
 static	int			g_nSamplesPerSec = SAMPLES_SEC;
-static	int			g_nBitsPerSample = 8;
+static	int			g_nBitsPerSample = 16;
 static	HWAVEOUT	HWaveOut;				/* Handle of opened WAVE Out and In device */
 static  HWAVEIN		HWaveIn;
 static	WAVEFORMATEX WaveFormat;			/* WAVEFORMATEX structure for reading in the WAVE fmt chunk */

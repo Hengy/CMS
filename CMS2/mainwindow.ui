@@ -458,17 +458,17 @@
       </property>
       <item>
        <property name="text">
+        <string>4000 Hz</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
         <string>8000 Hz</string>
        </property>
       </item>
       <item>
        <property name="text">
         <string>16000 Hz</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>32000 Hz</string>
        </property>
       </item>
      </widget>

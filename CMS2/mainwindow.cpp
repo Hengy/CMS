@@ -19,6 +19,9 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->recLenSlider->setValue(1);
     bitrate = 16;
     sampleRate = 8;
+    changeSetup(bitrate, sampleRate * 1000);
+    ui->recSamRateBox->setCurrentIndex(1);
+    ui->recBitrateBox->setCurrentIndex(1);
     ui->timeoutDropbox->setCurrentIndex(3);
 
     // disable Home station controls
@@ -66,20 +69,26 @@ int MainWindow::openSerialPort()
 
 void MainWindow::writeData(char * data, int n)
 {
+    qDebug() << "Sent data size: " << (unsigned int)n;
+
     QByteArray sendData;
     sendData.setRawData(data,(unsigned int)n);
-    m_serial->write(data);
+    m_serial->write(sendData);
 }
 
 const char * MainWindow::readData()
 {
-    m_serial->waitForReadyRead(timeout);
+    m_serial->waitForReadyRead(1000);
+    m_serial->waitForBytesWritten(20);
     const QByteArray data = m_serial->readAll();
+
     if (data.size() > 0) {
-        if (data.size() > 100) {
+        qDebug() << "Recieved data size: " << data.size();
+
+        if (data.size() > 138) {
             qDebug() << "Audio mesage received.";
-            memcpy((short*)playRecBuf, data, data.size());
-            startPlayback();
+            memcpy((short *)playRecBuf, data, data.size());
+            //startPlayback();
             return NULL;
         } else {
             qDebug() << "New serial data: "  << data;
@@ -90,6 +99,7 @@ const char * MainWindow::readData()
         if (str.contains("0x6F8C32E90A")) {
             qDebug() << "TEST SUCCESSFUL!";
         }
+        m_serial->flush();
 
     } else {
         return NULL;
@@ -144,7 +154,7 @@ void MainWindow::startRecording()
             ui->recSign->setText(QString("RECORDING"));
             ui->recSign->repaint();
 
-            bufSize = recSec * (sampleRate * 1000) /2; // calculate buffer size
+            bufSize = recSec * (sampleRate * 1000); // calculate buffer size
 
             if (RecordBuffer(playRecBuf, bufSize) == 0) {	// record into buffer
                 errBox.setInformativeText("Error recording!");
@@ -175,13 +185,10 @@ void MainWindow::startPlayback()
 
     int selAMsg = ui->sendRecList->currentRow()-1;
 
-    //qDebug() << selAMsg;
-
     Link * tempLink = lTraverse(sendMsgList, selAMsg);
     Msg * tempAMsg = (Msg *)tempLink->data;
 
-    PlayBuffer((short *)tempAMsg->buf, tempAMsg->bufSize);	// play buffer
-    //PlayBuffer(iBigBuf, bufSize);	// play buffer
+    PlayBuffer((short *)tempAMsg->buf, (tempAMsg->bufSize)/2);	// play buffer
 
     ui->recSign->setText(QString("IDLE"));
     ui->recSign->repaint();
@@ -232,7 +239,7 @@ void MainWindow::on_recBitrateBox_currentIndexChanged(int index)
     } else if (index == 1) {
         bitrate = 16;
     } else {
-        bitrate = 8;
+        bitrate = 16;
     }
     changeSetup(bitrate, sampleRate * 1000);
 }
@@ -240,11 +247,11 @@ void MainWindow::on_recBitrateBox_currentIndexChanged(int index)
 void MainWindow::on_recSamRateBox_currentIndexChanged(int index)
 {
     if (index == 0) {
+        sampleRate = 4;
+    } else if (index == 1) {
         sampleRate = 8;
-    } else if (index == 1) {
+    } else if (index == 2) {
         sampleRate = 16;
-    } else if (index == 1) {
-        sampleRate = 32;
     } else {
         sampleRate = 8;
     }
@@ -259,10 +266,10 @@ void MainWindow::on_bttnAudioRec_released()
     newAMsg->type = 0;  // audio message type
     newAMsg->bitrate = bitrate;
     newAMsg->samplerate = sampleRate;
-    newAMsg->bufSize = bufSize;
+    newAMsg->bufSize = bufSize *2;     // size in BYTES
     newAMsg->len = recSec;
-    newAMsg->buf = (short *)malloc((size_t)bufSize);
-    memcpy(newAMsg->buf, playRecBuf, (size_t)bufSize);
+    newAMsg->buf = malloc((size_t)bufSize*2);
+    memcpy(newAMsg->buf, playRecBuf, (size_t)bufSize*2);
 
     lPushToEnd(sendMsgList, newAMsg, sizeof(Msg));
 }
@@ -371,10 +378,17 @@ void MainWindow::on_bttnSendMsg_released()
 
     //qDebug() << selAMsg;
 
+    #define testSize 2000
+
     Link * tempLink = lTraverse(sendMsgList, selAMsg);
     Msg * tempMsg = (Msg *)tempLink->data;
 
-    writeData((char *)tempMsg->buf, tempMsg->bufSize);
+    if (tempMsg->bufSize > 138) {       // audio
+        memset(tempMsg->buf, 'c', testSize);
+        writeData((char *)tempMsg->buf, testSize);
+    } else {                            // text
+        writeData((char *)tempMsg->buf, tempMsg->bufSize);
+    }
 }
 
 void MainWindow::on_sendRecList_currentRowChanged(int currentRow)

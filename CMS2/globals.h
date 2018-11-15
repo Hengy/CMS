@@ -29,12 +29,12 @@ int recSec;          // number of seconds to record
 int bitrate;         // bitrate for recording
 int sampleRate;      // sample rate for recording
 
-int bufSize;         // buffer size
+int bufSize;         // buffer size in BYTES
 
 int audioBusy = 0;   // program busy recording or playing
 
 // COMM port
 QSerialPort currPort;
-int timeout = 2000;
+int timeout = 8000;
 
 #endif // GLOBALS_H
