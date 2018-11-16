@@ -20,9 +20,11 @@ public:
     ~MainWindow();
 
 private slots:
-    void writeData(char * data, int n);
-    const char * readData();
     int openSerialPort();
+    unsigned char checksum(unsigned char *, size_t);
+    struct Header * createHeader(struct Msg *, unsigned char rID, unsigned char sID);
+    void writeData(struct Msg *, int n);
+    const char * readData();
     void closeSerialPort();
 
     void on_radioRec_clicked();

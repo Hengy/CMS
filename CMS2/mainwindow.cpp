@@ -67,12 +67,55 @@ int MainWindow::openSerialPort()
     }
 }
 
-void MainWindow::writeData(char * data, int n)
+// checksum function: returns checksum (8bit). Returns 0 if there is a valid checksum at end
+unsigned char MainWindow::checksum (unsigned char *data, size_t dataLen) {
+    unsigned char check = 0;
+    while (dataLen-- != 0) {
+        check -= *data++;
+    }
+    return check;
+}
+
+// creates header structure for
+Header * MainWindow::createHeader(Msg * msg, unsigned char rID, unsigned char sID){
+    // new header
+    Header * newHeader = new Header;
+
+    newHeader->recAddr = rID;
+    newHeader->sendAddr = sID;
+    newHeader->compEncrpyt[0] = 0x00;
+    newHeader->compEncrpyt[1] = 0x00;
+    newHeader->compEncrpyt[2] = 0x00;
+    newHeader->compEncrpyt[3] = 0x00;
+
+    newHeader->checkSum = checksum((unsigned char *)msg->buf, msg->bufSize);
+
+    qDebug() << "checksum: " << newHeader->checkSum;
+
+    return newHeader;
+}
+
+
+void MainWindow::writeData(struct Msg * m, int n)
 {
-    qDebug() << "Sent data size: " << (unsigned int)n;
+    unsigned char ID = 0x00;
+    if (ui->sIDBox->currentIndex() == 0) {
+        ID = 0x69;
+    } else {
+        ID = 0x42;
+    }
+
+    Header * mHeader = createHeader(m, ID, 0x5A);
+
+    qDebug() << "mHeader size: " << m->bufSize + sizeof(*mHeader);
+
+    unsigned char * dataBuf = (unsigned char *)malloc(sizeof(m->buf) + sizeof((*mHeader)));
+
+    memcpy(dataBuf, mHeader, sizeof((*mHeader)));
+    memcpy(dataBuf+sizeof((*mHeader)), m->buf, n);
 
     QByteArray sendData;
-    sendData.setRawData(data,(unsigned int)n);
+    sendData.setRawData((char *)dataBuf, m->bufSize + sizeof(*mHeader));
     m_serial->write(sendData);
 }
 
@@ -92,6 +135,7 @@ const char * MainWindow::readData()
             return NULL;
         } else {
             qDebug() << "New serial data: "  << data;
+            //qDebug() << "Signature: " << (unsigned char)(*(data+4));
             return data.data();
         }
 
@@ -385,9 +429,11 @@ void MainWindow::on_bttnSendMsg_released()
 
     if (tempMsg->bufSize > 138) {       // audio
         memset(tempMsg->buf, 'c', testSize);
-        writeData((char *)tempMsg->buf, testSize);
+        //writeData((unsigned char *)tempMsg->buf, testSize);
+        writeData(tempMsg, testSize);
     } else {                            // text
-        writeData((char *)tempMsg->buf, tempMsg->bufSize);
+        //writeData((unsigned char *)tempMsg->buf, tempMsg->bufSize);
+        writeData(tempMsg, tempMsg->bufSize);
     }
 }
 
@@ -398,7 +444,7 @@ void MainWindow::on_sendRecList_currentRowChanged(int currentRow)
 void MainWindow::on_actionTest_1_triggered()
 {
     char testStr[13] = "0x6F8C32E90A";
-    writeData(testStr, 13);
+    //writeData(testStr, 13);
 }
 
 void MainWindow::on_timeoutDropbox_currentIndexChanged(int index)

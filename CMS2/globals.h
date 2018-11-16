@@ -8,6 +8,9 @@
 
 #define STD_BAUDRATE    4800
 
+#define SIGNATURE       0xDEADBEEF
+#define CHK_PATTERN     0xAA55AA55
+
 extern short playRecBuf[];
 
 // audio message
@@ -22,6 +25,17 @@ typedef struct Msg {
     int samplerate;     // samplerate of message
     int len;            // length of message (in seconds)
 } Msg;
+
+// sent message header structure
+typedef struct Header {
+    unsigned char lSignature[4] = {0xDE,0xAD,0xBE,0xEF};                // must be 0xDEADBEEF
+    unsigned char recAddr;                      // receiver address; address of the receiving computer
+    unsigned char sendAddr;                     // sender address; address of the sending computer
+    long dataLen;                               // length of data in BYTES
+    unsigned char compEncrpyt[4];               // parameters of compression and encryption
+    unsigned int checkPattern = CHK_PATTERN;    // must be 0xAA55AA55
+    unsigned char checkSum;                     // checksum of message (including header)
+} header;
 
 LList * sendMsgList;
 
