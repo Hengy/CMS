@@ -38,6 +38,9 @@ typedef struct Header {
 } header;
 
 LList * sendMsgList;
+LList * recMsgList;
+
+unsigned char thisID = 0xAA;
 
 int recSec;          // number of seconds to record
 int bitrate;         // bitrate for recording

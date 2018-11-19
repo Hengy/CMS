@@ -41,6 +41,7 @@ MainWindow::MainWindow(QWidget *parent) :
     currPort.setBaudRate(STD_BAUDRATE);
     // ALL OTHER PARAMETERS ARE SET TO DEFAULT: No Parity, 8 bits, 1 stop bit
 
+    // init send message list
     sendMsgList = new LList;
     lInit(sendMsgList);
 }
@@ -101,12 +102,12 @@ void MainWindow::writeData(struct Msg * m, int n)
 {
     unsigned char ID = 0x00;
     if (ui->sIDBox->currentIndex() == 0) {
-        ID = 0x77;
+        ID = 0x69;
     } else {
         ID = 0x42;
     }
 
-    Header * mHeader = createHeader(m, ID, 0x5A);
+    Header * mHeader = createHeader(m, ID, thisID);
 
     qDebug() << "Buffer size: " << m->bufSize + sizeof(*mHeader);
 
@@ -502,6 +503,21 @@ void MainWindow::on_timeoutDropbox_currentIndexChanged(int index)
             break;
         default:
             timeout = 2000;
+            break;
+    }
+}
+
+void MainWindow::on_IDBox_currentIndexChanged(int index)
+{
+    switch(index) {
+        case 0:
+            thisID = 0xAA;
+            break;
+        case 1:
+            thisID = 0x25;
+            break;
+        default:
+            thisID = 0xAA;
             break;
     }
 }

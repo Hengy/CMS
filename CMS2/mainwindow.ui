@@ -74,11 +74,11 @@
       <string>View/Play</string>
      </property>
     </widget>
-    <widget class="QColumnView" name="recMsgList">
+    <widget class="QListView" name="recMsgList">
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>21</y>
+       <y>20</y>
        <width>401</width>
        <height>341</height>
       </rect>
@@ -102,8 +102,8 @@
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>10</y>
-      <width>431</width>
+      <y>0</y>
+      <width>361</width>
       <height>41</height>
      </rect>
     </property>
@@ -123,8 +123,8 @@
    <widget class="QLabel" name="label_2">
     <property name="geometry">
      <rect>
-      <x>20</x>
-      <y>60</y>
+      <x>140</x>
+      <y>40</y>
       <width>101</width>
       <height>16</height>
      </rect>
@@ -136,8 +136,8 @@
    <widget class="QLabel" name="label_3">
     <property name="geometry">
      <rect>
-      <x>20</x>
-      <y>80</y>
+      <x>260</x>
+      <y>40</y>
       <width>101</width>
       <height>16</height>
      </rect>
@@ -387,9 +387,9 @@
      <widget class="QComboBox" name="sIDBox">
       <property name="geometry">
        <rect>
-        <x>198</x>
+        <x>188</x>
         <y>335</y>
-        <width>51</width>
+        <width>81</width>
         <height>22</height>
        </rect>
       </property>
@@ -403,6 +403,11 @@
         <string>0x42</string>
        </property>
       </item>
+      <item>
+       <property name="text">
+        <string>Broadcast</string>
+       </property>
+      </item>
      </widget>
      <widget class="QLabel" name="label_12">
       <property name="geometry">
@@ -414,7 +419,7 @@
        </rect>
       </property>
       <property name="text">
-       <string>Sender ID:</string>
+       <string>Send To:</string>
       </property>
      </widget>
     </widget>
@@ -772,9 +777,9 @@
    <widget class="QGroupBox" name="groupBox_2">
     <property name="geometry">
      <rect>
-      <x>160</x>
+      <x>20</x>
       <y>60</y>
-      <width>211</width>
+      <width>351</width>
       <height>51</height>
      </rect>
     </property>
@@ -805,6 +810,39 @@
      </property>
      <property name="text">
       <string>Compression</string>
+     </property>
+    </widget>
+    <widget class="QComboBox" name="IDBox">
+     <property name="geometry">
+      <rect>
+       <x>260</x>
+       <y>18</y>
+       <width>81</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <item>
+      <property name="text">
+       <string>0xAA</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>0x25</string>
+      </property>
+     </item>
+    </widget>
+    <widget class="QLabel" name="label_13">
+     <property name="geometry">
+      <rect>
+       <x>230</x>
+       <y>20</y>
+       <width>31</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>ID:</string>
      </property>
     </widget>
    </widget>

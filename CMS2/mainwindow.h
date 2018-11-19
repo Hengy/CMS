@@ -63,6 +63,8 @@ private slots:
 
     void on_timeoutDropbox_currentIndexChanged(int index);
 
+    void on_IDBox_currentIndexChanged(int index);
+
 private:
     Ui::MainWindow *ui;
     void disableCtrls();
