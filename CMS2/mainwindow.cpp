@@ -87,6 +87,7 @@ Header * MainWindow::createHeader(Msg * msg, unsigned char rID, unsigned char sI
     newHeader->compEncrpyt[1] = 0x00;
     newHeader->compEncrpyt[2] = 0x00;
     newHeader->compEncrpyt[3] = 0x00;
+    newHeader->dataLen = msg->bufSize;
 
     newHeader->checkSum = checksum((unsigned char *)msg->buf, msg->bufSize);
 
@@ -100,19 +101,21 @@ void MainWindow::writeData(struct Msg * m, int n)
 {
     unsigned char ID = 0x00;
     if (ui->sIDBox->currentIndex() == 0) {
-        ID = 0x69;
+        ID = 0x77;
     } else {
         ID = 0x42;
     }
 
     Header * mHeader = createHeader(m, ID, 0x5A);
 
-    qDebug() << "mHeader size: " << m->bufSize + sizeof(*mHeader);
+    qDebug() << "Buffer size: " << m->bufSize + sizeof(*mHeader);
 
-    unsigned char * dataBuf = (unsigned char *)malloc(sizeof(m->buf) + sizeof((*mHeader)));
+    unsigned char * dataBuf = (unsigned char *)malloc(m->bufSize + sizeof(*mHeader));
+
+    qDebug() << "mHeader size: " << sizeof(*mHeader);
 
     memcpy(dataBuf, mHeader, sizeof((*mHeader)));
-    memcpy(dataBuf+sizeof((*mHeader)), m->buf, n);
+    memcpy(dataBuf+sizeof((*mHeader)), m->buf, m->bufSize);
 
     QByteArray sendData;
     sendData.setRawData((char *)dataBuf, m->bufSize + sizeof(*mHeader));
@@ -135,7 +138,34 @@ const char * MainWindow::readData()
             return NULL;
         } else {
             qDebug() << "New serial data: "  << data;
-            //qDebug() << "Signature: " << (unsigned char)(*(data+4));
+
+            unsigned char sig[4] = {data[0],data[1],data[2],data[3]};
+            unsigned char rID = data[5];
+            unsigned char sID = data[6];
+            unsigned long dLen = (unsigned long)data[8];
+            unsigned char compEcrypt[4] = {data[11],data[12],data[13],data[14]};
+            unsigned char patt[4] = {data[16],data[17],data[18],data[19]};
+            unsigned char cSum = data[20];
+
+            qDebug() << "Sig: " << sig[0];
+            qDebug() << sig[1];
+            qDebug() << sig[2];
+            qDebug() << sig[3];
+
+            qDebug() << "Reciever ID: " << rID;
+            qDebug() << "Sender ID: " << sID;
+
+            qDebug() << "Data length: "<< dLen;
+
+            qDebug() << "Comp: "<< compEcrypt[0];
+
+            qDebug() << "Pattern: "<< patt[0];
+            qDebug() << patt[1];
+            qDebug() << patt[2];
+            qDebug() << patt[3];
+
+            qDebug() << "Checksum: "<< cSum;
+
             return data.data();
         }
 
@@ -143,7 +173,7 @@ const char * MainWindow::readData()
         if (str.contains("0x6F8C32E90A")) {
             qDebug() << "TEST SUCCESSFUL!";
         }
-        m_serial->flush();
+        //m_serial->flush();
 
     } else {
         return NULL;
@@ -255,6 +285,7 @@ void MainWindow::on_bttnAudioDel_released()
 
 void MainWindow::on_radioRec_clicked()
 {
+    connect(m_serial, &QSerialPort::readyRead, this, &MainWindow::readData);
     ui->sendTab->setEnabled(false);
     ui->setTab->setEnabled(false);
     ui->radioHome->setChecked(false);
@@ -263,6 +294,7 @@ void MainWindow::on_radioRec_clicked()
 
 void MainWindow::on_radioHome_clicked()
 {
+    disconnect(m_serial, &QSerialPort::readyRead, this, &MainWindow::readData);
     ui->radioHome->setChecked(true);
     ui->radioRec->setChecked(false);
     ui->sendTab->setEnabled(true);
@@ -428,7 +460,7 @@ void MainWindow::on_bttnSendMsg_released()
     Msg * tempMsg = (Msg *)tempLink->data;
 
     if (tempMsg->bufSize > 138) {       // audio
-        memset(tempMsg->buf, 'c', testSize);
+        //memset(tempMsg->buf, 'c', testSize);
         //writeData((unsigned char *)tempMsg->buf, testSize);
         writeData(tempMsg, testSize);
     } else {                            // text
