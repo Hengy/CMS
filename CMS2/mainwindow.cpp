@@ -148,6 +148,17 @@ const char * MainWindow::readData()
             unsigned char patt[4] = {data[16],data[17],data[18],data[19]};
             unsigned char cSum = data[20];
 
+            char * ID = (char *)malloc(5);
+            sprintf(ID, "%d", ID);
+
+            QString label;
+            label.append("Reciever:");
+            label.append(ID);
+            label.append("  Sender:");
+            label.append(sID);
+            label.append("  Size:");
+            label.append((int)dLen);
+
             qDebug() << "Sig: " << sig[0];
             qDebug() << sig[1];
             qDebug() << sig[2];
@@ -165,7 +176,20 @@ const char * MainWindow::readData()
             qDebug() << patt[2];
             qDebug() << patt[3];
 
+            int checkSumFailed = 0;
+            if (dLen > 0) {
+                if (checksum((unsigned char *)playRecBuf+21, dLen) != 0) {
+                    checkSumFailed = 1;
+                    qDebug() << "CHECKSUM FAILURE";
+                    label.append("  CHECKSUM FAILED");
+                } else {
+                    qDebug() << "GOOD CHECKSUM";
+                }
+            }
+
             qDebug() << "Checksum: "<< cSum;
+
+            ui->recMsgList->addItem(label);
 
             return data.data();
         }

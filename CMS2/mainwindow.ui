@@ -74,7 +74,7 @@
       <string>View/Play</string>
      </property>
     </widget>
-    <widget class="QListView" name="recMsgList">
+    <widget class="QListWidget" name="recMsgList">
      <property name="geometry">
       <rect>
        <x>10</x>
