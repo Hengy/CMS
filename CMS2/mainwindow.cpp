@@ -82,12 +82,13 @@ Header * MainWindow::createHeader(Msg * msg, unsigned char rID, unsigned char sI
     // new header
     Header * newHeader = new Header;
 
+    if (msg->type) {
+        newHeader->type = 0xF0; // type 1: text
+    } else {
+        newHeader->type = 0x0F; // type 0: audio
+    }
     newHeader->recAddr = rID;
     newHeader->sendAddr = sID;
-    newHeader->compEncrpyt[0] = 0x00;
-    newHeader->compEncrpyt[1] = 0x00;
-    newHeader->compEncrpyt[2] = 0x00;
-    newHeader->compEncrpyt[3] = 0x00;
     newHeader->dataLen = msg->bufSize;
 
     newHeader->checkSum = checksum((unsigned char *)msg->buf, msg->bufSize);
@@ -98,7 +99,7 @@ Header * MainWindow::createHeader(Msg * msg, unsigned char rID, unsigned char sI
 }
 
 
-void MainWindow::writeData(struct Msg * m, int n)
+void MainWindow::writeData(struct Msg * m)
 {
     unsigned char ID = 0x00;
     if (ui->sIDBox->currentIndex() == 0) {
@@ -140,24 +141,21 @@ const char * MainWindow::readData()
         } else {
             qDebug() << "New serial data: "  << data;
 
-            unsigned char sig[4] = {data[0],data[1],data[2],data[3]};
+            unsigned char mType = data[0];
+            unsigned char sig[4] = {data[1],data[2],data[3],data[4]};
             unsigned char rID = data[5];
             unsigned char sID = data[6];
             unsigned long dLen = (unsigned long)data[8];
-            unsigned char compEcrypt[4] = {data[11],data[12],data[13],data[14]};
-            unsigned char patt[4] = {data[16],data[17],data[18],data[19]};
-            unsigned char cSum = data[20];
+            unsigned char compEcrypt[4] = {data[13],data[14],data[15],data[16]};
+            unsigned char cSum = data[17];
 
-            char * ID = (char *)malloc(5);
-            sprintf(ID, "%d", ID);
+            if (rID == 0xFF || rID == thisID) {
+                qDebug() << "Right address!";
+            } else {
+                qDebug() << "WRONG address!";
+            }
 
-            QString label;
-            label.append("Reciever:");
-            label.append(ID);
-            label.append("  Sender:");
-            label.append(sID);
-            label.append("  Size:");
-            label.append((int)dLen);
+            qDebug() << "Type: " << mType;
 
             qDebug() << "Sig: " << sig[0];
             qDebug() << sig[1];
@@ -170,26 +168,26 @@ const char * MainWindow::readData()
             qDebug() << "Data length: "<< dLen;
 
             qDebug() << "Comp: "<< compEcrypt[0];
+            qDebug() << compEcrypt[1];
+            qDebug() << compEcrypt[2];
+            qDebug() << compEcrypt[3];
 
-            qDebug() << "Pattern: "<< patt[0];
-            qDebug() << patt[1];
-            qDebug() << patt[2];
-            qDebug() << patt[3];
+            QString labelStr;
+
+            labelStr = QString("Reciever: %1\tSender: %2\tSize: %3").arg(QString::number((int)rID), QString::number((int)sID), QString::number((int)dLen-1));
+            ui->recMsgList->addItem(labelStr);
 
             int checkSumFailed = 0;
             if (dLen > 0) {
-                if (checksum((unsigned char *)playRecBuf+21, dLen) != 0) {
+                if (checksum((unsigned char *)playRecBuf+19, dLen) != 0) {
                     checkSumFailed = 1;
-                    qDebug() << "CHECKSUM FAILURE";
-                    label.append("  CHECKSUM FAILED");
-                } else {
-                    qDebug() << "GOOD CHECKSUM";
+                    ui->recMsgList->item(ui->recMsgList->count()-1)->setForeground(Qt::red);
                 }
+            } else {
+                qDebug() << "No data. Size 0";
             }
 
-            qDebug() << "Checksum: "<< cSum;
-
-            ui->recMsgList->addItem(label);
+            qDebug() << "Checksum recieved: "<< cSum;
 
             return data.data();
         }
@@ -487,10 +485,10 @@ void MainWindow::on_bttnSendMsg_released()
     if (tempMsg->bufSize > 138) {       // audio
         //memset(tempMsg->buf, 'c', testSize);
         //writeData((unsigned char *)tempMsg->buf, testSize);
-        writeData(tempMsg, testSize);
+        writeData(tempMsg);
     } else {                            // text
         //writeData((unsigned char *)tempMsg->buf, tempMsg->bufSize);
-        writeData(tempMsg, tempMsg->bufSize);
+        writeData(tempMsg);
     }
 }
 
@@ -539,6 +537,12 @@ void MainWindow::on_IDBox_currentIndexChanged(int index)
             break;
         case 1:
             thisID = 0x25;
+            break;
+        case 2:
+            thisID = 0x69;
+            break;
+        case 3:
+            thisID = 0x43;
             break;
         default:
             thisID = 0xAA;

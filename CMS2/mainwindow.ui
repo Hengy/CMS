@@ -831,6 +831,16 @@
        <string>0x25</string>
       </property>
      </item>
+     <item>
+      <property name="text">
+       <string>0x69</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>0x43</string>
+      </property>
+     </item>
     </widget>
     <widget class="QLabel" name="label_13">
      <property name="geometry">

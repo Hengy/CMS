@@ -23,7 +23,7 @@ private slots:
     int openSerialPort();
     unsigned char checksum(unsigned char *, size_t);
     struct Header * createHeader(struct Msg *, unsigned char rID, unsigned char sID);
-    void writeData(struct Msg *, int n);
+    void writeData(struct Msg *);
     const char * readData();
     void closeSerialPort();
 

@@ -28,14 +28,20 @@ typedef struct Msg {
 
 // sent message header structure
 typedef struct Header {
+    unsigned char type;     // type of message: (0) audio (1) text
     unsigned char lSignature[4] = {0xDE,0xAD,0xBE,0xEF};      // must be 0xDEADBEEF
     unsigned char recAddr;                      // receiver address; address of the receiving computer
     unsigned char sendAddr;                     // sender address; address of the sending computer
     unsigned long dataLen;                      // length of data in BYTES
-    unsigned char compEncrpyt[4] = {0x00,0x00,0x00,0x00};     // parameters of compression and encryption
-    unsigned char checkPattern[4] = {0xAA,0x55,0xAA,0x55};    // must be 0xAA55AA55
+    unsigned char sampleRate;
+    unsigned char compEncrpyt[4] = {0x01,0x02,0x05,0x08};     // parameters of compression and encryption
     unsigned char checkSum;                     // checksum of message (including header)
 } header;
+
+typedef struct RecMsg {
+    Msg message;
+    Header head;
+} RecMsg;
 
 LList * sendMsgList;
 LList * recMsgList;
