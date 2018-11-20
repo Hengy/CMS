@@ -143,8 +143,8 @@ const char * MainWindow::readData()
 
             unsigned char mType = data[0];
             unsigned char sig[4] = {data[1],data[2],data[3],data[4]};
-            unsigned char rID = data[5];
-            unsigned char sID = data[6];
+            unsigned char rID = data[6];
+            unsigned char sID = data[5];
             unsigned long dLen = (unsigned long)data[8];
             unsigned char compEcrypt[4] = {data[13],data[14],data[15],data[16]};
             unsigned char cSum = data[17];
@@ -155,6 +155,13 @@ const char * MainWindow::readData()
                 qDebug() << "WRONG address!";
             }
 
+            if ((mType & 0xF0) > 0x30) {
+                qDebug() << "Type: text";
+            } else if ((mType & 0x0F) < 0x0D){
+                qDebug() << "Type: audio";
+            } else {
+                qDebug() << "Type ERROR!";
+            }
             qDebug() << "Type: " << mType;
 
             qDebug() << "Sig: " << sig[0];
