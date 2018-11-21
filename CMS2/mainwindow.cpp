@@ -24,7 +24,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->recBitrateBox->setCurrentIndex(1);
     ui->timeoutDropbox->setCurrentIndex(3);
 
-    for (short i=0; i<256; i++) {
+    for (short i=0; i<256; i+=10) {
         ui->sPriorityBox->addItem(QString::number(i));
     }
 
@@ -108,8 +108,10 @@ void MainWindow::writeData(struct Msg * m)
     unsigned char ID = 0x00;
     if (ui->sIDBox->currentIndex() == 0) {
         ID = 0x69;
-    } else {
+    } else if (ui->sIDBox->currentIndex() == 1){
         ID = 0x42;
+    } else {
+        ID = 0xFF;
     }
 
     unsigned char priority = ui->sPriorityBox->currentIndex();
@@ -148,61 +150,94 @@ const char * MainWindow::readData()
         } else {
             qDebug() << "New serial data: "  << data;
 
-            unsigned char priority = data[0];
-            unsigned char mType = data[1];
-            unsigned char sig[4] = {data[2],data[3],data[4],data[5]};
             unsigned char rID = data[7];
-            unsigned char sID = data[6];
             unsigned long dLen = (unsigned long)data[9];
-            unsigned char compEcrypt[4] = {data[14],data[15],data[16],data[17]};
-            unsigned char cSum = data[18];
 
-            if (rID == 0xFF || rID == thisID) {
-                qDebug() << "Right address!";
+            qDebug() << "Reciever ID: " << rID << " This ID: " << thisID;
+
+            if (rID != 0xFF && rID != thisID) {
+                qDebug() << "Recieved message with wrong address: " << rID;
             } else {
-                qDebug() << "WRONG address!";
-            }
+                // address was a match, or it was a broadcast
 
-            if ((mType & 0xF0) > 0x30) {
-                qDebug() << "Type: text";
-            } else if ((mType & 0x0F) < 0x0D){
-                qDebug() << "Type: audio";
-            } else {
-                qDebug() << "Type ERROR!";
-            }
-            qDebug() << "Type: " << mType;
+                unsigned char priority = data[0];
+                unsigned char mType = data[1];
+                unsigned char sig[4] = {data[2],data[3],data[4],data[5]};
+                unsigned char sID = data[6];
+                unsigned char sRate = data[13];
+                unsigned char compEcrypt[4] = {data[14],data[15],data[16],data[17]};
+                unsigned char cSum = data[18];
 
-            qDebug() << "Sig: " << sig[0];
-            qDebug() << sig[1];
-            qDebug() << sig[2];
-            qDebug() << sig[3];
 
-            qDebug() << "Reciever ID: " << rID;
-            qDebug() << "Sender ID: " << sID;
+                qDebug() << "Sender ID: " << sID;
 
-            qDebug() << "Data length: "<< dLen;
-
-            qDebug() << "Comp: "<< compEcrypt[0];
-            qDebug() << compEcrypt[1];
-            qDebug() << compEcrypt[2];
-            qDebug() << compEcrypt[3];
-
-            QString labelStr;
-
-            labelStr = QString("Reciever: %1\tSender: %2\tSize: %3").arg(QString::number((int)rID), QString::number((int)sID), QString::number((int)dLen-1));
-            ui->recMsgList->addItem(labelStr);
-
-            int checkSumFailed = 0;
-            if (dLen > 0) {
-                if (checksum((unsigned char *)playRecBuf+19, dLen) != 0) {
-                    checkSumFailed = 1;
-                    ui->recMsgList->item(ui->recMsgList->count()-1)->setForeground(Qt::red);
+                int typeErr = 0;
+                if ((mType & 0xF0) > 0x30) {
+                    mType = 1;  // text
+                } else if ((mType & 0x0F) < 0x0D){
+                    mType = 0;  // audio
+                } else {
+                    qDebug() << "Message recieved with type error";
+                    typeErr = 1;
                 }
-            } else {
-                qDebug() << "No data. Size 0";
-            }
 
-            qDebug() << "Checksum recieved: "<< cSum;
+                if (!typeErr) {
+                    Msg* newRMsg = new Msg;
+                    Header* newRHead = new Header;
+                    RecMsg* newRecMsg = new RecMsg;
+//                    newRecMsg->message = (unsigned char *)malloc(sizeof(Header));
+//                    newRecMsg->
+                    memcpy(newRecMsg->message, newRMsg, sizeof(Header));
+                    memcpy(newRecMsg->head, newRHead, dLen);
+
+//                    newRHead->recAddr = rID;
+//                    newRHead->sendAddr = sID;
+//                    newRHead->dataLen = dLen;
+//                    newRHead->type = mType;
+//                    newRHead->sampleRate = sRate;
+//                    newRHead->checkSum = cSum;
+//                    memcpy(newRHead->compEncrpyt, compEcrypt, 4);
+
+//                    newRMsg->type = mType;
+//                    newRMsg->bufSize = dLen;
+//                    memcpy((unsigned char *)newRMsg->buf, (unsigned char *)data[19], dLen);
+
+                    qDebug() << "newRecMsg created";
+                }
+
+                qDebug() << "Priority" << priority;
+
+                qDebug() << "Type: " << mType;
+
+                qDebug() << "Sig: " << sig[0];
+                qDebug() << sig[1];
+                qDebug() << sig[2];
+                qDebug() << sig[3];
+
+                qDebug() << "Data length: "<< dLen;
+
+                qDebug() << "Comp: "<< compEcrypt[0];
+                qDebug() << compEcrypt[1];
+                qDebug() << compEcrypt[2];
+                qDebug() << compEcrypt[3];
+
+                QString labelStr;
+
+                labelStr = QString("Reciever: %1\tSender: %2\tSize: %3").arg(QString::number((int)rID), QString::number((int)sID), QString::number((int)dLen-1));
+                ui->recMsgList->addItem(labelStr);
+
+                int checkSumFailed = 0;
+                if (dLen > 0) {
+                    if (checksum((unsigned char *)playRecBuf+19, dLen) != 0) {
+                        checkSumFailed = 1;
+                        ui->recMsgList->item(ui->recMsgList->count()-1)->setForeground(Qt::red);
+                    }
+                } else {
+                    qDebug() << "No data. Size 0";
+                }
+
+                qDebug() << "Checksum recieved: "<< cSum;
+            }
 
             return data.data();
         }
@@ -548,19 +583,19 @@ void MainWindow::on_IDBox_currentIndexChanged(int index)
 {
     switch(index) {
         case 0:
-            thisID = 0xAA;
+            thisID = 0x69;
             break;
         case 1:
             thisID = 0x25;
             break;
         case 2:
-            thisID = 0x69;
+            thisID = 0xAA;
             break;
         case 3:
             thisID = 0x43;
             break;
         default:
-            thisID = 0xAA;
+            thisID = 0x69;
             break;
     }
 }

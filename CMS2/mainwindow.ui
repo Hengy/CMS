@@ -825,17 +825,17 @@
      </property>
      <item>
       <property name="text">
+       <string>0x69</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
        <string>0xAA</string>
       </property>
      </item>
      <item>
       <property name="text">
        <string>0x25</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>0x69</string>
       </property>
      </item>
      <item>

@@ -2,14 +2,12 @@
 #define GLOBALS_H
 
 #include "L2L.h"
+#include "bst.h"
 #include <QList>
 #include <QString>
 #include <QSerialPort>
 
 #define STD_BAUDRATE    4800
-
-#define SIGNATURE       0xDEADBEEF
-#define CHK_PATTERN     0xAA55AA55
 
 extern short playRecBuf[];
 
@@ -37,14 +35,14 @@ typedef struct Header {
 } header;
 
 typedef struct RecMsg {
-    Msg message;
-    Header head;
+    struct Msg* message;
+    struct Header* head;
 } RecMsg;
 
 LList * sendMsgList;
-LList * recMsgList;
+Leaf * recMsgTree;
 
-unsigned char thisID = 0xAA;
+unsigned char thisID = 0x69;
 
 int recSec;          // number of seconds to record
 int bitrate;         // bitrate for recording
