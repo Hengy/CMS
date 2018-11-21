@@ -28,14 +28,16 @@ SOURCES += \
         main.cpp \
         mainwindow.cpp \
     L2L.cpp \
-    sound.cpp
+    sound.cpp \
+    bst.cpp
 
 HEADERS += \
         mainwindow.h \
     globals.h \
     L2L.h \
     mainwindow.h \
-    sound.h
+    sound.h \
+    bst.h
 
 FORMS += \
         mainwindow.ui \

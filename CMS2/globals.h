@@ -13,8 +13,6 @@
 
 extern short playRecBuf[];
 
-// audio message
-
 // audio message struct
 typedef struct Msg {
     unsigned char type; // type of message: (0) audio (1) text

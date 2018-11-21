@@ -24,6 +24,10 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->recBitrateBox->setCurrentIndex(1);
     ui->timeoutDropbox->setCurrentIndex(3);
 
+    for (short i=0; i<256; i++) {
+        ui->sPriorityBox->addItem(QString::number(i));
+    }
+
     // disable Home station controls
     ui->sendTab->setEnabled(false);
     ui->setTab->setEnabled(false);
@@ -108,19 +112,22 @@ void MainWindow::writeData(struct Msg * m)
         ID = 0x42;
     }
 
+    unsigned char priority = ui->sPriorityBox->currentIndex();
+
     Header * mHeader = createHeader(m, ID, thisID);
 
-    qDebug() << "Buffer size: " << m->bufSize + sizeof(*mHeader);
+    qDebug() << "Buffer size: " << m->bufSize + sizeof(*mHeader) + 1;
 
-    unsigned char * dataBuf = (unsigned char *)malloc(m->bufSize + sizeof(*mHeader));
+    unsigned char * dataBuf = (unsigned char *)malloc(m->bufSize + sizeof(*mHeader) + 1);
 
-    qDebug() << "mHeader size: " << sizeof(*mHeader);
+    qDebug() << "mHeader size: " << sizeof(*mHeader) + 1;
 
-    memcpy(dataBuf, mHeader, sizeof((*mHeader)));
-    memcpy(dataBuf+sizeof((*mHeader)), m->buf, m->bufSize);
+    memset(dataBuf, priority, 1);
+    memcpy(dataBuf+1, mHeader, sizeof((*mHeader)));
+    memcpy(dataBuf+sizeof((*mHeader))+1, m->buf, m->bufSize);
 
     QByteArray sendData;
-    sendData.setRawData((char *)dataBuf, m->bufSize + sizeof(*mHeader));
+    sendData.setRawData((char *)dataBuf, m->bufSize + sizeof(*mHeader) + 1);
     m_serial->write(sendData);
 }
 
@@ -141,13 +148,14 @@ const char * MainWindow::readData()
         } else {
             qDebug() << "New serial data: "  << data;
 
-            unsigned char mType = data[0];
-            unsigned char sig[4] = {data[1],data[2],data[3],data[4]};
-            unsigned char rID = data[6];
-            unsigned char sID = data[5];
-            unsigned long dLen = (unsigned long)data[8];
-            unsigned char compEcrypt[4] = {data[13],data[14],data[15],data[16]};
-            unsigned char cSum = data[17];
+            unsigned char priority = data[0];
+            unsigned char mType = data[1];
+            unsigned char sig[4] = {data[2],data[3],data[4],data[5]};
+            unsigned char rID = data[7];
+            unsigned char sID = data[6];
+            unsigned long dLen = (unsigned long)data[9];
+            unsigned char compEcrypt[4] = {data[14],data[15],data[16],data[17]};
+            unsigned char cSum = data[18];
 
             if (rID == 0xFF || rID == thisID) {
                 qDebug() << "Right address!";
