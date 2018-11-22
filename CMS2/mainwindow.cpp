@@ -139,6 +139,8 @@ const char * MainWindow::readData()
     m_serial->waitForBytesWritten(20);
     const QByteArray data = m_serial->readAll();
 
+    const char* tempData;
+
     if (data.size() > 0) {
         qDebug() << "Recieved data size: " << data.size();
 
@@ -168,6 +170,9 @@ const char * MainWindow::readData()
                 unsigned char compEcrypt[4] = {data[14],data[15],data[16],data[17]};
                 unsigned char cSum = data[18];
 
+                for (int i=0; i<data.size(); i++) {
+                    qDebug() << i << ": " << QString::number(data[i]);
+                }
 
                 qDebug() << "Sender ID: " << sID;
 
@@ -185,22 +190,24 @@ const char * MainWindow::readData()
                     Msg* newRMsg = new Msg;
                     Header* newRHead = new Header;
                     RecMsg* newRecMsg = new RecMsg;
-//                    newRecMsg->message = (unsigned char *)malloc(sizeof(Header));
-//                    newRecMsg->
-                    memcpy(newRecMsg->message, newRMsg, sizeof(Header));
-                    memcpy(newRecMsg->head, newRHead, dLen);
 
-//                    newRHead->recAddr = rID;
-//                    newRHead->sendAddr = sID;
-//                    newRHead->dataLen = dLen;
-//                    newRHead->type = mType;
-//                    newRHead->sampleRate = sRate;
-//                    newRHead->checkSum = cSum;
-//                    memcpy(newRHead->compEncrpyt, compEcrypt, 4);
+                    newRHead->recAddr = rID;
+                    newRHead->sendAddr = sID;
+                    newRHead->dataLen = dLen;
+                    newRHead->type = mType;
+                    newRHead->sampleRate = sRate;
+                    newRHead->checkSum = cSum;
+                    memcpy(newRHead->compEncrpyt, compEcrypt, 4);
 
-//                    newRMsg->type = mType;
-//                    newRMsg->bufSize = dLen;
-//                    memcpy((unsigned char *)newRMsg->buf, (unsigned char *)data[19], dLen);
+                    newRMsg->type = mType;
+                    newRMsg->bufSize = dLen;
+                    unsigned char* temp = (unsigned char *)malloc(dLen);
+                    tempData = data.data();
+                    memcpy(temp, ((unsigned char*)tempData)+21, dLen);
+                    newRMsg->buf = temp;
+
+                    newRecMsg->head = newRHead;
+                    newRecMsg->message = newRMsg;
 
                     qDebug() << "newRecMsg created";
                 }
@@ -221,9 +228,15 @@ const char * MainWindow::readData()
                 qDebug() << compEcrypt[2];
                 qDebug() << compEcrypt[3];
 
+                tempData = data.data();
+
                 QString labelStr;
 
-                labelStr = QString("Reciever: %1\tSender: %2\tSize: %3").arg(QString::number((int)rID), QString::number((int)sID), QString::number((int)dLen-1));
+                if (mType) {
+                    labelStr = QString("Reciever: %1\tSender: %2\tSize: %3\tText: \"%4\"").arg(QString::number((int)rID), QString::number((int)sID), QString::number((int)dLen-1), tempData+21);
+                } else {
+                    labelStr = QString("Reciever: %1\tSender: %2\tSize: %3").arg(QString::number((int)rID), QString::number((int)sID), QString::number((int)dLen-1));
+                }
                 ui->recMsgList->addItem(labelStr);
 
                 int checkSumFailed = 0;
