@@ -11,6 +11,7 @@ MainWindow::MainWindow(QWidget *parent) :
     m_serial(new QSerialPort(this))
 {
     connect(m_serial, &QSerialPort::readyRead, this, &MainWindow::readData);
+    connect(m_serial, &QSerialPort::errorOccurred, this, &MainWindow::handleError);
 
     ui->setupUi(this);
 
@@ -69,6 +70,14 @@ int MainWindow::openSerialPort()
     } else {
         qDebug() << "Port open error!\n";
         return 0;
+    }
+}
+
+void MainWindow::handleError(QSerialPort::SerialPortError error)
+{
+    if (error == QSerialPort::ResourceError) {
+        QMessageBox::critical(this, tr("Critical Error"), m_serial->errorString());
+        closeSerialPort();
     }
 }
 
@@ -155,7 +164,7 @@ const char * MainWindow::readData()
             unsigned char rID = data[7];
             unsigned long dLen = (unsigned long)data[9];
 
-            qDebug() << "Reciever ID: " << rID << " This ID: " << thisID;
+//            qDebug() << "Reciever ID: " << rID << " This ID: " << thisID;
 
             if (rID != 0xFF && rID != thisID) {
                 qDebug() << "Recieved message with wrong address: " << rID;
@@ -170,11 +179,7 @@ const char * MainWindow::readData()
                 unsigned char compEcrypt[4] = {data[14],data[15],data[16],data[17]};
                 unsigned char cSum = data[18];
 
-                for (int i=0; i<data.size(); i++) {
-                    qDebug() << i << ": " << QString::number(data[i]);
-                }
-
-                qDebug() << "Sender ID: " << sID;
+//                qDebug() << "Sender ID: " << sID;
 
                 int typeErr = 0;
                 if ((mType & 0xF0) > 0x30) {
@@ -208,25 +213,23 @@ const char * MainWindow::readData()
 
                     newRecMsg->head = newRHead;
                     newRecMsg->message = newRMsg;
-
-                    qDebug() << "newRecMsg created";
                 }
 
-                qDebug() << "Priority" << priority;
+//                qDebug() << "Priority" << priority;
 
-                qDebug() << "Type: " << mType;
+//                qDebug() << "Type: " << mType;
 
-                qDebug() << "Sig: " << sig[0];
-                qDebug() << sig[1];
-                qDebug() << sig[2];
-                qDebug() << sig[3];
+//                qDebug() << "Sig: " << sig[0];
+//                qDebug() << sig[1];
+//                qDebug() << sig[2];
+//                qDebug() << sig[3];
 
-                qDebug() << "Data length: "<< dLen;
+//                qDebug() << "Data length: "<< dLen;
 
-                qDebug() << "Comp: "<< compEcrypt[0];
-                qDebug() << compEcrypt[1];
-                qDebug() << compEcrypt[2];
-                qDebug() << compEcrypt[3];
+//                qDebug() << "Comp: "<< compEcrypt[0];
+//                qDebug() << compEcrypt[1];
+//                qDebug() << compEcrypt[2];
+//                qDebug() << compEcrypt[3];
 
                 tempData = data.data();
 
@@ -239,19 +242,28 @@ const char * MainWindow::readData()
                 }
                 ui->recMsgList->addItem(labelStr);
 
+                // add message to tree
+                if (recMsgTree == NULL) {
+                    recMsgTree = initBST(priority);
+                } else {
+                    insertToBST(recMsgTree, priority);
+                }
+
                 int checkSumFailed = 0;
                 if (dLen > 0) {
                     if (checksum((unsigned char *)playRecBuf+19, dLen) != 0) {
                         checkSumFailed = 1;
                         ui->recMsgList->item(ui->recMsgList->count()-1)->setForeground(Qt::red);
                     }
+
                 } else {
                     qDebug() << "No data. Size 0";
                 }
 
-                qDebug() << "Checksum recieved: "<< cSum;
+//                qDebug() << "Checksum recieved: "<< cSum;
             }
 
+            m_serial->clear(QSerialPort::AllDirections);
             return data.data();
         }
 
@@ -261,9 +273,8 @@ const char * MainWindow::readData()
         }
         //m_serial->flush();
 
-    } else {
-        return NULL;
     }
+    return NULL;
 }
 
 void MainWindow::closeSerialPort()
