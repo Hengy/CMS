@@ -25,9 +25,13 @@ private slots:
     void handleError(QSerialPort::SerialPortError error);
 
     unsigned char checksum(unsigned char *, size_t);
-    struct Header * createHeader(struct Msg *, unsigned char rID, unsigned char sID);
+
+    struct Header * createHeader(struct Msg *, unsigned char pri, unsigned char rID, unsigned char sID);
+
     void writeData(struct Msg *);
+
     const char * readData();
+
     void closeSerialPort();
 
     void on_radioRec_clicked();

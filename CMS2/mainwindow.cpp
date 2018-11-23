@@ -91,7 +91,7 @@ unsigned char MainWindow::checksum (unsigned char *data, size_t dataLen) {
 }
 
 // creates header structure for
-Header * MainWindow::createHeader(Msg * msg, unsigned char rID, unsigned char sID){
+Header * MainWindow::createHeader(Msg * msg, unsigned char pri, unsigned char rID, unsigned char sID){
     // new header
     Header * newHeader = new Header;
 
@@ -100,6 +100,7 @@ Header * MainWindow::createHeader(Msg * msg, unsigned char rID, unsigned char sI
     } else {
         newHeader->type = 0x0F; // type 0: audio
     }
+    newHeader->priority = pri;
     newHeader->recAddr = rID;
     newHeader->sendAddr = sID;
     newHeader->dataLen = msg->bufSize;
@@ -112,7 +113,7 @@ Header * MainWindow::createHeader(Msg * msg, unsigned char rID, unsigned char sI
 }
 
 
-void MainWindow::writeData(struct Msg * m)
+void MainWindow::writeData(Msg * m)
 {
     unsigned char ID = 0x00;
     if (ui->sIDBox->currentIndex() == 0) {
@@ -125,20 +126,19 @@ void MainWindow::writeData(struct Msg * m)
 
     unsigned char priority = ui->sPriorityBox->currentIndex();
 
-    Header * mHeader = createHeader(m, ID, thisID);
+    Header * mHeader = createHeader(m, priority, ID, thisID);
 
-    qDebug() << "Buffer size: " << m->bufSize + sizeof(*mHeader) + 1;
+    qDebug() << "Buffer size: " << m->bufSize + sizeof(*mHeader);
 
-    unsigned char * dataBuf = (unsigned char *)malloc(m->bufSize + sizeof(*mHeader) + 1);
+    unsigned char * dataBuf = (unsigned char *)malloc(m->bufSize + sizeof(*mHeader));
 
-    qDebug() << "mHeader size: " << sizeof(*mHeader) + 1;
+    qDebug() << "mHeader size: " << sizeof(*mHeader);
 
-    memset(dataBuf, priority, 1);
-    memcpy(dataBuf+1, mHeader, sizeof((*mHeader)));
+    memcpy(dataBuf, mHeader, sizeof((*mHeader)));
     memcpy(dataBuf+sizeof((*mHeader))+1, m->buf, m->bufSize);
 
     QByteArray sendData;
-    sendData.setRawData((char *)dataBuf, m->bufSize + sizeof(*mHeader) + 1);
+    sendData.setRawData((char *)dataBuf, m->bufSize + sizeof(*mHeader));
     m_serial->write(sendData);
 }
 
@@ -153,125 +153,108 @@ const char * MainWindow::readData()
     if (data.size() > 0) {
         qDebug() << "Recieved data size: " << data.size();
 
-        if (data.size() > 138) {
-            qDebug() << "Audio mesage received.";
-            memcpy((short *)playRecBuf, data, data.size());
-            //startPlayback();
-            return NULL;
+        qDebug() << "New serial data: "  << data;
+
+        unsigned char rID = data[7];
+        unsigned long dLen = (unsigned long)data[8];
+
+        qDebug() << "Reciever ID: " << rID << " This ID: " << thisID;
+
+        if (rID != 0xFF && rID != thisID) {
+            qDebug() << "Recieved message with wrong address: " << rID;
         } else {
-            qDebug() << "New serial data: "  << data;
+            // address was a match, or it was a broadcast
 
-            unsigned char rID = data[7];
-            unsigned long dLen = (unsigned long)data[9];
+            unsigned char priority = data[0];
+            unsigned char mType = data[1];
+            unsigned char sig[4] = {data[2],data[3],data[4],data[5]};
+            unsigned char sID = data[6];
+            unsigned char sRate = data[12];
+            unsigned char compEcrypt[4] = {data[13],data[14],data[15],data[16]};
+            unsigned char cSum = data[17];
 
-//            qDebug() << "Reciever ID: " << rID << " This ID: " << thisID;
+            qDebug() << "Sender ID: " << sID;
 
-            if (rID != 0xFF && rID != thisID) {
-                qDebug() << "Recieved message with wrong address: " << rID;
+            int typeErr = 0;
+            if ((mType & 0xF0) > 0x30) {
+                mType = 1;  // text
+            } else if ((mType & 0x0F) < 0x0D){
+                mType = 0;  // audio
             } else {
-                // address was a match, or it was a broadcast
-
-                unsigned char priority = data[0];
-                unsigned char mType = data[1];
-                unsigned char sig[4] = {data[2],data[3],data[4],data[5]};
-                unsigned char sID = data[6];
-                unsigned char sRate = data[13];
-                unsigned char compEcrypt[4] = {data[14],data[15],data[16],data[17]};
-                unsigned char cSum = data[18];
-
-//                qDebug() << "Sender ID: " << sID;
-
-                int typeErr = 0;
-                if ((mType & 0xF0) > 0x30) {
-                    mType = 1;  // text
-                } else if ((mType & 0x0F) < 0x0D){
-                    mType = 0;  // audio
-                } else {
-                    qDebug() << "Message recieved with type error";
-                    typeErr = 1;
-                }
-
-                if (!typeErr) {
-                    Msg* newRMsg = new Msg;
-                    Header* newRHead = new Header;
-                    RecMsg* newRecMsg = new RecMsg;
-
-                    newRHead->recAddr = rID;
-                    newRHead->sendAddr = sID;
-                    newRHead->dataLen = dLen;
-                    newRHead->type = mType;
-                    newRHead->sampleRate = sRate;
-                    newRHead->checkSum = cSum;
-                    memcpy(newRHead->compEncrpyt, compEcrypt, 4);
-
-                    newRMsg->type = mType;
-                    newRMsg->bufSize = dLen;
-                    unsigned char* temp = (unsigned char *)malloc(dLen);
-                    tempData = data.data();
-                    memcpy(temp, ((unsigned char*)tempData)+21, dLen);
-                    newRMsg->buf = temp;
-
-                    newRecMsg->head = newRHead;
-                    newRecMsg->message = newRMsg;
-                }
-
-//                qDebug() << "Priority" << priority;
-
-//                qDebug() << "Type: " << mType;
-
-//                qDebug() << "Sig: " << sig[0];
-//                qDebug() << sig[1];
-//                qDebug() << sig[2];
-//                qDebug() << sig[3];
-
-//                qDebug() << "Data length: "<< dLen;
-
-//                qDebug() << "Comp: "<< compEcrypt[0];
-//                qDebug() << compEcrypt[1];
-//                qDebug() << compEcrypt[2];
-//                qDebug() << compEcrypt[3];
-
-                tempData = data.data();
-
-                QString labelStr;
-
-                if (mType) {
-                    labelStr = QString("Reciever: %1\tSender: %2\tSize: %3\tText: \"%4\"").arg(QString::number((int)rID), QString::number((int)sID), QString::number((int)dLen-1), tempData+21);
-                } else {
-                    labelStr = QString("Reciever: %1\tSender: %2\tSize: %3").arg(QString::number((int)rID), QString::number((int)sID), QString::number((int)dLen-1));
-                }
-                ui->recMsgList->addItem(labelStr);
-
-                // add message to tree
-                if (recMsgTree == NULL) {
-                    recMsgTree = initBST(priority);
-                } else {
-                    insertToBST(recMsgTree, priority);
-                }
-
-                int checkSumFailed = 0;
-                if (dLen > 0) {
-                    if (checksum((unsigned char *)playRecBuf+19, dLen) != 0) {
-                        checkSumFailed = 1;
-                        ui->recMsgList->item(ui->recMsgList->count()-1)->setForeground(Qt::red);
-                    }
-
-                } else {
-                    qDebug() << "No data. Size 0";
-                }
-
-//                qDebug() << "Checksum recieved: "<< cSum;
+                qDebug() << "Message recieved with type error";
+                typeErr = 1;
             }
 
-            m_serial->clear(QSerialPort::AllDirections);
-            return data.data();
+            if (!typeErr) {
+                Msg* newRMsg = new Msg;
+                Header* newRHead = new Header;
+                RecMsg* newRecMsg = new RecMsg;
+
+                newRHead->recAddr = rID;
+                newRHead->sendAddr = sID;
+                newRHead->dataLen = dLen;
+                newRHead->type = mType;
+                newRHead->sampleRate = sRate;
+                newRHead->checkSum = cSum;
+                memcpy(newRHead->compEncrpyt, compEcrypt, 4);
+
+                newRMsg->type = mType;
+                newRMsg->bufSize = dLen;
+                unsigned char* temp = (unsigned char *)malloc(dLen);
+                tempData = data.data();
+                memcpy(temp, ((unsigned char*)tempData)+21, dLen);
+                newRMsg->buf = temp;
+
+                newRecMsg->head = newRHead;
+                newRecMsg->message = newRMsg;
+            }
+
+            qDebug() << "Priority" << priority;
+
+            qDebug() << "Type: " << mType;
+
+            qDebug() << "Sig: " << (char)sig[0] << (char)sig[1] << (char)sig[2] << (char)sig[3];
+
+            qDebug() << "Data length: "<< dLen;
+
+            qDebug() << "Comp: "<< compEcrypt[0] << compEcrypt[1] << compEcrypt[2] << compEcrypt[3];
+
+            tempData = data.data();
+
+            QString labelStr;
+
+            if (mType) {
+                labelStr = QString("Reciever: %1\tSender: %2\tSize: %3\tText: \"%4\"").arg(QString::number((int)rID), QString::number((int)sID), QString::number((int)dLen-1), tempData+21);
+            } else {
+                labelStr = QString("Reciever: %1\tSender: %2\tSize: %3").arg(QString::number((int)rID), QString::number((int)sID), QString::number((int)dLen-1));
+            }
+            ui->recMsgList->addItem(labelStr);
+
+            // add message to tree
+            if (recMsgTree == NULL) {
+                recMsgTree = initBST(priority);
+                //qDebug() << "added first to tree";
+            } else {
+                insertToBST(recMsgTree, priority);
+                //qDebug() << "added to tree";
+            }
+
+            int checkSumFailed = 0;
+            if (dLen > 0) {
+                if (checksum((unsigned char *)playRecBuf+19, dLen) != 0) {
+                    checkSumFailed = 1;
+                    ui->recMsgList->item(ui->recMsgList->count()-1)->setForeground(Qt::red);
+                }
+
+            } else {
+                qDebug() << "No data. Size 0";
+            }
+
+            qDebug() << "Checksum recieved: "<< cSum;
         }
 
-        QString str = QString(data);
-        if (str.contains("0x6F8C32E90A")) {
-            qDebug() << "TEST SUCCESSFUL!";
-        }
-        //m_serial->flush();
+        m_serial->clear(QSerialPort::AllDirections);
+        return data.data();
 
     }
     return NULL;
@@ -547,23 +530,20 @@ void MainWindow::on_bttnSaveText_released()
 
 void MainWindow::on_bttnSendMsg_released()
 {
-    int selAMsg = ui->sendRecList->currentRow()-1;
+    int selAMsg = ui->sendRecList->currentRow();
 
-    //qDebug() << selAMsg;
-
-    #define testSize 2000
+    qDebug() << selAMsg;
 
     Link * tempLink = lTraverse(sendMsgList, selAMsg);
     Msg * tempMsg = (Msg *)tempLink->data;
+    //Msg * tempMsg = new Msg;
+    //memcpy(tempMsg, tempLink->data, sizeof(tempLink->data));
+    //(Msg *)tempLink->data;
 
-    if (tempMsg->bufSize > 138) {       // audio
-        //memset(tempMsg->buf, 'c', testSize);
-        //writeData((unsigned char *)tempMsg->buf, testSize);
-        writeData(tempMsg);
-    } else {                            // text
-        //writeData((unsigned char *)tempMsg->buf, tempMsg->bufSize);
-        writeData(tempMsg);
-    }
+    qDebug() << "Write size: " << tempMsg->bufSize;
+    qDebug() << "Text: " << (char *)tempMsg->buf;
+
+    writeData(tempMsg);
 }
 
 void MainWindow::on_sendRecList_currentRowChanged(int currentRow)
@@ -572,8 +552,7 @@ void MainWindow::on_sendRecList_currentRowChanged(int currentRow)
 
 void MainWindow::on_actionTest_1_triggered()
 {
-    char testStr[13] = "0x6F8C32E90A";
-    //writeData(testStr, 13);
+
 }
 
 void MainWindow::on_timeoutDropbox_currentIndexChanged(int index)

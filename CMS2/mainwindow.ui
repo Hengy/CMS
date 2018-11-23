@@ -245,11 +245,6 @@
         <height>191</height>
        </rect>
       </property>
-      <item>
-       <property name="text">
-        <string>New Message</string>
-       </property>
-      </item>
      </widget>
      <widget class="QPushButton" name="bttnSendMsg">
       <property name="geometry">
