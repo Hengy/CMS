@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>900</width>
+    <width>1011</width>
     <height>600</height>
    </rect>
   </property>
@@ -28,7 +28,7 @@
      <rect>
       <x>460</x>
       <y>130</y>
-      <width>421</width>
+      <width>541</width>
       <height>401</height>
      </rect>
     </property>
@@ -38,7 +38,7 @@
     <widget class="QPushButton" name="bttnRecDel">
      <property name="geometry">
       <rect>
-       <x>330</x>
+       <x>450</x>
        <y>370</y>
        <width>75</width>
        <height>23</height>
@@ -78,10 +78,41 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>20</y>
-       <width>401</width>
-       <height>341</height>
+       <y>60</y>
+       <width>521</width>
+       <height>301</height>
       </rect>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_15">
+     <property name="geometry">
+      <rect>
+       <x>30</x>
+       <y>25</y>
+       <width>81</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Message count:</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="treeCount">
+     <property name="geometry">
+      <rect>
+       <x>120</x>
+       <y>20</y>
+       <width>47</width>
+       <height>26</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>14</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>0</string>
      </property>
     </widget>
    </widget>
@@ -90,7 +121,7 @@
      <rect>
       <x>20</x>
       <y>110</y>
-      <width>841</width>
+      <width>981</width>
       <height>20</height>
      </rect>
     </property>
@@ -149,7 +180,7 @@
    <widget class="QGroupBox" name="modeGroup">
     <property name="geometry">
      <rect>
-      <x>750</x>
+      <x>870</x>
       <y>20</y>
       <width>131</width>
       <height>80</height>
@@ -632,7 +663,7 @@
    <widget class="QGroupBox" name="groupBox">
     <property name="geometry">
      <rect>
-      <x>391</x>
+      <x>510</x>
       <y>20</y>
       <width>351</width>
       <height>80</height>
@@ -859,7 +890,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>900</width>
+     <width>1011</width>
      <height>21</height>
     </rect>
    </property>
@@ -892,14 +923,7 @@
     <property name="title">
      <string>Testing</string>
     </property>
-    <widget class="QMenu" name="menuTest_RS232">
-     <property name="title">
-      <string>Test RS232</string>
-     </property>
-     <addaction name="actionTest_1"/>
-     <addaction name="actionTest_2"/>
-    </widget>
-    <addaction name="menuTest_RS232"/>
+    <addaction name="actionBER_Test"/>
    </widget>
    <addaction name="menuCMS"/>
    <addaction name="menuMessage"/>
@@ -969,14 +993,9 @@
     <string>Delete Audio</string>
    </property>
   </action>
-  <action name="actionTest_1">
+  <action name="actionBER_Test">
    <property name="text">
-    <string>Test 1</string>
-   </property>
-  </action>
-  <action name="actionTest_2">
-   <property name="text">
-    <string>Test 2</string>
+    <string>BER Test</string>
    </property>
   </action>
  </widget>

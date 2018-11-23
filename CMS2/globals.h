@@ -57,4 +57,13 @@ int audioBusy = 0;   // program busy recording or playing
 QSerialPort currPort;
 int timeout = 8000;
 
+int treeCount = 0;
+
+QTimer *timer;
+
+unsigned char BERarray[20] = {0x5A, 0xA5, 0x55, 0xAA, 0x11,
+                             0x5A, 0xA5, 0x55, 0xAA, 0x11,
+                             0x5A, 0xA5, 0x55, 0xAA, 0x11,
+                             0x5A, 0xA5, 0x55, 0xAA, 0x11};
+
 #endif // GLOBALS_H

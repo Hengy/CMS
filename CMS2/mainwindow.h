@@ -72,6 +72,8 @@ private slots:
 
     void on_IDBox_currentIndexChanged(int index);
 
+    void on_actionBER_Test_triggered();
+
 private:
     Ui::MainWindow *ui;
     void disableCtrls();
