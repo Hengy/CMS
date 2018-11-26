@@ -168,8 +168,7 @@ void MainWindow::writeData(Msg * m)
     m_serial->write(sendData);
 }
 
-const char * MainWindow::readData()
-{
+const char * MainWindow::readData() {
     //m_serial->waitForReadyRead(1000);
     m_serial->waitForBytesWritten(160);
     const QByteArray data = m_serial->readAll();
@@ -194,38 +193,18 @@ const char * MainWindow::readData()
             }
             qDebug() << "BER: " << errors << "/160";
         } else {
-            //qDebug() << "Recieved data size: " << data.size();
-
-            qDebug() << "New serial data: "  << data;
+            qDebug() << "Raw data: "  << data;
 
             Header* newRHead = new Header;
             memcpy(newRHead, data, sizeof(Header));
 
-            qDebug() << "Reciever ID: " << newRHead->recAddr << " This ID: " << thisID;
-
-            if (newRHead->recAddr != 0xFF && newRHead->recAddr != thisID) {
-                qDebug() << "Recieved message with wrong address: " << newRHead->recAddr;
-            } else {
-                // address was a match, or it was a broadcast
-
-                //unsigned char priority = data[0];
-                //unsigned char mType = data[1];
-                //unsigned char sig[4] = {data[2],data[3],data[4],data[5]};
-                //unsigned char sID = data[7];
-                //unsigned char sRate = data[12];
-                //unsigned char compEcrypt[4] = {data[13],data[14],data[15],data[16]};
-                //unsigned int timestamp = (unsigned int)data[20];
-                //unsigned char cSum = data[28];
-
-                //qDebug() << "Sender ID: " << sID;
-
+            if (newRHead->recAddr == 0xFF || newRHead->recAddr == thisID) {
                 int typeErr = 0;
-                if ((newRHead->type & 0xF0) > 0x30) {
+                if ( ( (newRHead->type & 0xF0) > 0x20) && (newRHead->dataLen <= ( sizeof(Header) + 140 ) ) ) {      // if type is valid & size of data is less than 140
                     newRHead->type = 1;  // text
-                } else if ((newRHead->type & 0x0F) < 0x0D){
+                } else if ((newRHead->type & 0x0F) < 0x0E){ // if type is valid & size of data is greater than 140
                     newRHead->type = 0;  // audio
                 } else {
-                    qDebug() << "Message recieved with type error";
                     typeErr = 1;
                 }
 
@@ -242,24 +221,20 @@ const char * MainWindow::readData()
 
                     newRecMsg->head = newRHead;
                     newRecMsg->message = newRMsg;
+
+                    if (newRHead->dataLen > 0) {
+                        if (( checksum( (unsigned char*)newRMsg->buf, newRHead->dataLen) - newRHead->checkSum) != 0) {
+                            newRHead->checkSum = 1; // checksum bad
+                            qDebug() << "Bad checkum!";
+                        } else {
+                            newRHead->checkSum = 0;
+                        }
+                    }
                 }
 
-                //qDebug() << "Priority" << newRHead->priority;
-
-                //qDebug() << "Type: " << newRHead->type;
-
-                //qDebug() << "Sig: " << newRHead->lSignature;
-
-                qDebug() << "Data length: "<< newRHead->dataLen;
-
-                qDebug() << "Timestamp: " << newRHead->timestamp;
-
-                //qDebug() << "Comp: "<< newRHead->compEncrpyt;
 
                 tempData = data.data();
-
                 QString labelStr;
-
                 if (newRHead->type) {
                     labelStr = QString("Priority: %1   Timestamp: %2   Reciever: %3   Sender: %4   Size: %5   Text: \"%6\"").arg(QString::number(newRHead->priority), QString::number((int)newRHead->timestamp), QString::number((int)newRHead->recAddr), QString::number((int)newRHead->sendAddr), QString::number((int)newRHead->dataLen-1), tempData+sizeof(Header) + 1);
                 } else {
@@ -276,20 +251,12 @@ const char * MainWindow::readData()
                     insertToBST(recMsgTreeTime, (int)newRHead->timestamp);  // time sorted
                 }
 
+//                qDebug() << "Priority sorted: ";
+//                traverseBST(recMsgTreePri);
+//                qDebug() << "Time sorted: ";
+//                traverseBST(recMsgTreeTime);
+
                 refreshList();
-
-                int checkSumFailed = 0;
-                if (newRHead->dataLen > 0) {
-                    if (( checksum(((unsigned char*)tempData) + sizeof(Header) + 1, newRHead->dataLen) - newRHead->checkSum) != 0) {
-                        checkSumFailed = 1;
-                        ui->recMsgList->item(ui->recMsgList->count()-1)->setForeground(Qt::red);
-                    }
-
-                } else {
-                    qDebug() << "No data. Size 0";
-                }
-
-                qDebug() << "Checksum recieved: "<< newRHead->checkSum;
             }
         }
 
@@ -665,4 +632,13 @@ void MainWindow::on_timeRadioButton_released()
     ui->timeRadioButton->setChecked(true);
     ui->priRadioButton->setChecked(false);
     sortOrder = 0;  // time
+}
+
+void MainWindow::on_textMsg_textChanged()
+{
+    int charCount = ui->textMsg->toPlainText().length();
+    ui->sendMsgCount->setText(QString::number(charCount));
+    if (charCount > 139) {
+        ui->textMsg->
+    }
 }

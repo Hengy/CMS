@@ -82,6 +82,8 @@ private slots:
 
     void on_timeRadioButton_released();
 
+    void on_textMsg_textChanged();
+
 private:
     Ui::MainWindow *ui;
     void disableCtrls();
