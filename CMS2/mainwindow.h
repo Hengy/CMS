@@ -24,6 +24,8 @@ private slots:
 
     void handleError(QSerialPort::SerialPortError error);
 
+    void refreshList();
+
     unsigned char checksum(unsigned char *, size_t);
 
     struct Header * createHeader(struct Msg *, unsigned char pri, unsigned char rID, unsigned char sID);
@@ -73,6 +75,10 @@ private slots:
     void on_IDBox_currentIndexChanged(int index);
 
     void on_actionBER_Test_triggered();
+
+    void on_priRadioButton_released();
+
+    void on_timeRadioButton_released();
 
 private:
     Ui::MainWindow *ui;

@@ -29,6 +29,10 @@ MainWindow::MainWindow(QWidget *parent) :
         ui->sPriorityBox->addItem(QString::number(i));
     }
 
+    // recieved message sort order
+    ui->timeRadioButton->setChecked(false);
+    ui->priRadioButton->setChecked(true);
+
     // disable Home station controls
     ui->sendTab->setEnabled(false);
     ui->setTab->setEnabled(false);
@@ -83,6 +87,10 @@ void MainWindow::handleError(QSerialPort::SerialPortError error)
         QMessageBox::critical(this, tr("Critical Error"), m_serial->errorString());
         closeSerialPort();
     }
+}
+
+void MainWindow::refreshList() {
+
 }
 
 // checksum function: returns checksum (8bit). Returns 0 if there is a valid checksum at end
@@ -634,4 +642,18 @@ void MainWindow::on_actionBER_Test_triggered()
     BERmsg->bufSize = 20;
 
     writeData(BERmsg);
+}
+
+void MainWindow::on_priRadioButton_released()
+{
+    ui->timeRadioButton->setChecked(false);
+    ui->priRadioButton->setChecked(true);
+    sortOrder = 1;  // priority
+}
+
+void MainWindow::on_timeRadioButton_released()
+{
+    ui->timeRadioButton->setChecked(true);
+    ui->priRadioButton->setChecked(false);
+    sortOrder = 0;  // time
 }

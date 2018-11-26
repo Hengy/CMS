@@ -35,9 +35,34 @@ struct Leaf* searchBST(struct Leaf* root, int priority) {
         return root;
     }
 
-    if (root->priority < priority) {
+    if (root->priority <= priority) {
         return searchBST(root->right, priority);
     }
 
     return searchBST(root->left, priority);
+}
+
+int sizeOfBST(struct Leaf* root) {
+    if(root == NULL) return 0;
+    else {
+        return (sizeOfBST(root->left) + 1 + sizeOfBST(root->right));
+    }
+}
+
+LList* getPriOrder(Leaf* root) {
+    LList* list = new LList;
+    lInit(list);
+
+    // traverse and add to array
+
+    return list;
+}
+
+LList* getTimeOrder() {
+    LList* list = new LList;
+
+    // traverse and add to new BST (based on timestamp)
+    // traverse and add to array
+
+    return list;
 }

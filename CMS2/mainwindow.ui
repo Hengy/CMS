@@ -115,6 +115,32 @@
       <string>0</string>
      </property>
     </widget>
+    <widget class="QRadioButton" name="timeRadioButton">
+     <property name="geometry">
+      <rect>
+       <x>470</x>
+       <y>25</y>
+       <width>51</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Time</string>
+     </property>
+    </widget>
+    <widget class="QRadioButton" name="priRadioButton">
+     <property name="geometry">
+      <rect>
+       <x>400</x>
+       <y>25</y>
+       <width>61</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Priority</string>
+     </property>
+    </widget>
    </widget>
    <widget class="Line" name="line_2">
     <property name="geometry">

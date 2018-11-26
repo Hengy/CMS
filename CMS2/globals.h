@@ -51,8 +51,6 @@ int sampleRate;      // sample rate for recording
 
 int bufSize;         // buffer size in BYTES
 
-int audioBusy = 0;   // program busy recording or playing
-
 // COMM port
 QSerialPort currPort;
 int timeout = 8000;
@@ -65,5 +63,7 @@ unsigned char BERarray[20] = {0x5A, 0xA5, 0x55, 0xAA, 0x11,
                              0x5A, 0xA5, 0x55, 0xAA, 0x11,
                              0x5A, 0xA5, 0x55, 0xAA, 0x11,
                              0x5A, 0xA5, 0x55, 0xAA, 0x11};
+
+int sortOrder = 1;  // (0) time recieved (1) priority
 
 #endif // GLOBALS_H
