@@ -21,11 +21,4 @@ struct Leaf* searchBST(struct Leaf* root, int priority);
 
 int sizeOfBST(struct Leaf* root);
 
-void priOrderHelper(LList* l, Leaf* t);
-
-LList* getPriOrder(Leaf* root);
-
-LList* getTimeOrder(Leaf* root);
-
-
 #endif // BST_H

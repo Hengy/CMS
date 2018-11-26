@@ -32,6 +32,7 @@ typedef struct Header {
     unsigned long dataLen;                      // length of data in BYTES
     unsigned char sampleRate = 8;
     unsigned char compEncrpyt[4] = {0x01,0x02,0x05,0x08};     // parameters of compression and encryption
+    unsigned int timestamp = 0;
     unsigned char checkSum;                     // checksum of message (including header)
 } header;
 
@@ -41,7 +42,8 @@ typedef struct RecMsg {
 } RecMsg;
 
 LList * sendMsgList;
-Leaf * recMsgTree;
+Leaf * recMsgTreePri;
+Leaf * recMsgTreeTime;
 
 unsigned char thisID = 0x69;
 
@@ -65,5 +67,7 @@ unsigned char BERarray[20] = {0x5A, 0xA5, 0x55, 0xAA, 0x11,
                              0x5A, 0xA5, 0x55, 0xAA, 0x11};
 
 int sortOrder = 1;  // (0) time recieved (1) priority
+
+unsigned long startTime = 0;
 
 #endif // GLOBALS_H

@@ -48,21 +48,3 @@ int sizeOfBST(struct Leaf* root) {
         return (sizeOfBST(root->left) + 1 + sizeOfBST(root->right));
     }
 }
-
-LList* getPriOrder(Leaf* root) {
-    LList* list = new LList;
-    lInit(list);
-
-    // traverse and add to array
-
-    return list;
-}
-
-LList* getTimeOrder() {
-    LList* list = new LList;
-
-    // traverse and add to new BST (based on timestamp)
-    // traverse and add to array
-
-    return list;
-}

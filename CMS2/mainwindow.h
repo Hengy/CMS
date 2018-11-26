@@ -24,6 +24,8 @@ private slots:
 
     void handleError(QSerialPort::SerialPortError error);
 
+    unsigned long getTime();
+
     void refreshList();
 
     unsigned char checksum(unsigned char *, size_t);

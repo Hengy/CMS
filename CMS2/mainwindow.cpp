@@ -57,6 +57,8 @@ MainWindow::MainWindow(QWidget *parent) :
     // init send message list
     sendMsgList = new LList;
     lInit(sendMsgList);
+
+    startTime = getTime();
 }
 
 MainWindow::~MainWindow()
@@ -89,8 +91,18 @@ void MainWindow::handleError(QSerialPort::SerialPortError error)
     }
 }
 
-void MainWindow::refreshList() {
+unsigned long MainWindow::getTime() {
+   time_t seconds;
 
+   seconds = time(NULL);
+
+   return (unsigned long)seconds;
+}
+
+void MainWindow::refreshList() {
+    int treeSize = sizeOfBST(recMsgTreePri);
+    qDebug() << "Tree size: " << treeSize;
+    ui->treeCount->setText(QString::number(treeSize));
 }
 
 // checksum function: returns checksum (8bit). Returns 0 if there is a valid checksum at end
@@ -116,6 +128,8 @@ Header * MainWindow::createHeader(Msg * msg, unsigned char pri, unsigned char rI
     newHeader->recAddr = rID;
     newHeader->sendAddr = sID;
     newHeader->dataLen = msg->bufSize;
+    newHeader->timestamp = (int)(getTime() - startTime);
+    qDebug() << "Timestamp: " << newHeader->timestamp;
 
     newHeader->checkSum = checksum((unsigned char *)msg->buf, msg->bufSize);
 
@@ -156,8 +170,8 @@ void MainWindow::writeData(Msg * m)
 
 const char * MainWindow::readData()
 {
-    //m_serial->waitForReadyRead(100);
-    m_serial->waitForBytesWritten(20);
+    //m_serial->waitForReadyRead(1000);
+    m_serial->waitForBytesWritten(160);
     const QByteArray data = m_serial->readAll();
 
     const char* tempData;
@@ -180,35 +194,36 @@ const char * MainWindow::readData()
             }
             qDebug() << "BER: " << errors << "/160";
         } else {
-            qDebug() << "Recieved data size: " << data.size();
+            //qDebug() << "Recieved data size: " << data.size();
 
             qDebug() << "New serial data: "  << data;
 
-            unsigned char rID = data[6];
-            unsigned long dLen = (unsigned long)data[8];
+            Header* newRHead = new Header;
+            memcpy(newRHead, data, sizeof(Header));
 
-            qDebug() << "Reciever ID: " << rID << " This ID: " << thisID;
+            qDebug() << "Reciever ID: " << newRHead->recAddr << " This ID: " << thisID;
 
-            if (rID != 0xFF && rID != thisID) {
-                qDebug() << "Recieved message with wrong address: " << rID;
+            if (newRHead->recAddr != 0xFF && newRHead->recAddr != thisID) {
+                qDebug() << "Recieved message with wrong address: " << newRHead->recAddr;
             } else {
                 // address was a match, or it was a broadcast
 
-                unsigned char priority = data[0];
-                unsigned char mType = data[1];
-                unsigned char sig[4] = {data[2],data[3],data[4],data[5]};
-                unsigned char sID = data[7];
-                unsigned char sRate = data[12];
-                unsigned char compEcrypt[4] = {data[13],data[14],data[15],data[16]};
-                unsigned char cSum = data[17];
+                //unsigned char priority = data[0];
+                //unsigned char mType = data[1];
+                //unsigned char sig[4] = {data[2],data[3],data[4],data[5]};
+                //unsigned char sID = data[7];
+                //unsigned char sRate = data[12];
+                //unsigned char compEcrypt[4] = {data[13],data[14],data[15],data[16]};
+                //unsigned int timestamp = (unsigned int)data[20];
+                //unsigned char cSum = data[28];
 
                 //qDebug() << "Sender ID: " << sID;
 
                 int typeErr = 0;
-                if ((mType & 0xF0) > 0x30) {
-                    mType = 1;  // text
-                } else if ((mType & 0x0F) < 0x0D){
-                    mType = 0;  // audio
+                if ((newRHead->type & 0xF0) > 0x30) {
+                    newRHead->type = 1;  // text
+                } else if ((newRHead->type & 0x0F) < 0x0D){
+                    newRHead->type = 0;  // audio
                 } else {
                     qDebug() << "Message recieved with type error";
                     typeErr = 1;
@@ -216,62 +231,56 @@ const char * MainWindow::readData()
 
                 if (!typeErr) {
                     Msg* newRMsg = new Msg;
-                    Header* newRHead = new Header;
                     RecMsg* newRecMsg = new RecMsg;
 
-                    newRHead->recAddr = rID;
-                    newRHead->sendAddr = sID;
-                    newRHead->dataLen = dLen;
-                    newRHead->type = mType;
-                    newRHead->sampleRate = sRate;
-                    newRHead->checkSum = cSum;
-                    memcpy(newRHead->compEncrpyt, compEcrypt, 4);
-
-                    newRMsg->type = mType;
-                    newRMsg->bufSize = dLen;
-                    unsigned char* temp = (unsigned char *)malloc(dLen);
+                    newRMsg->type = newRHead->type;
+                    newRMsg->bufSize = newRHead->dataLen;
+                    unsigned char* temp = (unsigned char *)malloc(newRHead->dataLen);
                     tempData = data.data();
-                    memcpy(temp, ((unsigned char*)tempData)+21, dLen);
+                    memcpy(temp, ((unsigned char*)tempData) + sizeof(Header) + 1, newRHead->dataLen);
                     newRMsg->buf = temp;
 
                     newRecMsg->head = newRHead;
                     newRecMsg->message = newRMsg;
                 }
 
-                //qDebug() << "Priority" << priority;
+                //qDebug() << "Priority" << newRHead->priority;
 
-                //qDebug() << "Type: " << mType;
+                //qDebug() << "Type: " << newRHead->type;
 
-                //qDebug() << "Sig: " << (char)sig[0] << (char)sig[1] << (char)sig[2] << (char)sig[3];
+                //qDebug() << "Sig: " << newRHead->lSignature;
 
-                qDebug() << "Data length: "<< dLen;
+                qDebug() << "Data length: "<< newRHead->dataLen;
 
-                //qDebug() << "Comp: "<< compEcrypt[0] << compEcrypt[1] << compEcrypt[2] << compEcrypt[3];
+                qDebug() << "Timestamp: " << newRHead->timestamp;
+
+                //qDebug() << "Comp: "<< newRHead->compEncrpyt;
 
                 tempData = data.data();
 
                 QString labelStr;
 
-                if (mType) {
-                    labelStr = QString("Priority: %1\tReciever: %2\tSender: %3\tSize: %4\tText: \"%5\"").arg(QString::number(priority), QString::number((int)rID), QString::number((int)sID), QString::number((int)dLen-1), tempData+21);
+                if (newRHead->type) {
+                    labelStr = QString("Priority: %1   Timestamp: %2   Reciever: %3   Sender: %4   Size: %5   Text: \"%6\"").arg(QString::number(newRHead->priority), QString::number((int)newRHead->timestamp), QString::number((int)newRHead->recAddr), QString::number((int)newRHead->sendAddr), QString::number((int)newRHead->dataLen-1), tempData+sizeof(Header) + 1);
                 } else {
-                    labelStr = QString("Priority: %1\tReciever: %2\tSender: %3\tSize: %4").arg(QString::number(priority), QString::number((int)rID), QString::number((int)sID), QString::number((int)dLen-1));
+                    labelStr = QString("Priority: %1   Timestamp: %2   Reciever: %3   Sender: %4   Size: %5").arg(QString::number(newRHead->priority), QString::number((int)newRHead->timestamp), QString::number((int)newRHead->recAddr), QString::number((int)newRHead->sendAddr), QString::number((int)newRHead->dataLen-1));
                 }
                 ui->recMsgList->addItem(labelStr);
 
-                // add message to tree
-                if (recMsgTree == NULL) {
-                    recMsgTree = initBST(priority);
+                // add message to trees
+                if (recMsgTreePri == NULL) {
+                    recMsgTreePri = initBST(newRHead->priority);      // priority sorted
+                    recMsgTreeTime = initBST((int)newRHead->timestamp);     // time sorted
                 } else {
-                    insertToBST(recMsgTree, priority);
+                    insertToBST(recMsgTreePri, newRHead->priority);   // priority sorted
+                    insertToBST(recMsgTreeTime, (int)newRHead->timestamp);  // time sorted
                 }
 
-                treeCount++;
-                ui->treeCount->setText(QString::number(treeCount));
+                refreshList();
 
                 int checkSumFailed = 0;
-                if (dLen > 0) {
-                    if (checksum((unsigned char *)playRecBuf+19, dLen) != 0) {
+                if (newRHead->dataLen > 0) {
+                    if (( checksum(((unsigned char*)tempData) + sizeof(Header) + 1, newRHead->dataLen) - newRHead->checkSum) != 0) {
                         checkSumFailed = 1;
                         ui->recMsgList->item(ui->recMsgList->count()-1)->setForeground(Qt::red);
                     }
@@ -280,7 +289,7 @@ const char * MainWindow::readData()
                     qDebug() << "No data. Size 0";
                 }
 
-                qDebug() << "Checksum recieved: "<< cSum;
+                qDebug() << "Checksum recieved: "<< newRHead->checkSum;
             }
         }
 
