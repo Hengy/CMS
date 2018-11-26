@@ -1186,8 +1186,60 @@ debug\mainwindow.obj: ..\CMS2\mainwindow.cpp ..\CMS2\mainwindow.h \
 		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtSerialPort\qserialport.h \
 		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtSerialPort\qtserialportversion.h \
 		ui_mainwindow.h \
+		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtCore\QVariant \
+		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtWidgets\QAction \
+		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtWidgets\qaction.h \
+		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtWidgets\qactiongroup.h \
+		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtWidgets\QApplication \
+		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtWidgets\qapplication.h \
+		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtWidgets\qdesktopwidget.h \
+		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtGui\qguiapplication.h \
+		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtGui\qinputmethod.h \
+		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtWidgets\QCheckBox \
+		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtWidgets\qcheckbox.h \
+		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtWidgets\qabstractbutton.h \
+		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtWidgets\QComboBox \
+		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtWidgets\qcombobox.h \
+		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtWidgets\qabstractitemdelegate.h \
+		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtWidgets\qstyleoption.h \
+		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtWidgets\qabstractspinbox.h \
+		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtGui\qvalidator.h \
+		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtWidgets\qslider.h \
+		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtWidgets\qabstractslider.h \
+		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtWidgets\qstyle.h \
+		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtWidgets\qtabbar.h \
+		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtWidgets\qrubberband.h \
+		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtWidgets\QFrame \
+		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtWidgets\QGroupBox \
+		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtWidgets\qgroupbox.h \
+		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtWidgets\QLabel \
+		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtWidgets\qlabel.h \
+		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtWidgets\QListWidget \
+		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtWidgets\qlistwidget.h \
+		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtWidgets\qlistview.h \
+		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtWidgets\qabstractitemview.h \
+		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtWidgets\qabstractscrollarea.h \
+		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtWidgets\QMenu \
+		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtWidgets\qmenu.h \
+		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtWidgets\QMenuBar \
+		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtWidgets\qmenubar.h \
+		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtWidgets\QPushButton \
+		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtWidgets\qpushbutton.h \
+		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtWidgets\QRadioButton \
+		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtWidgets\qradiobutton.h \
+		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtWidgets\QSlider \
+		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtWidgets\QStatusBar \
+		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtWidgets\qstatusbar.h \
+		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtWidgets\QTabWidget \
+		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtWidgets\QTextEdit \
+		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtWidgets\qtextedit.h \
+		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtGui\qtextdocument.h \
+		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtWidgets\QToolBar \
+		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtWidgets\qtoolbar.h \
+		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtWidgets\QWidget \
 		..\CMS2\globals.h \
 		..\CMS2\L2L.h \
+		..\CMS2\bst.h \
 		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtGui\QList \
 		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtCore\QString \
 		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtSerialPort\QSerialPort \
@@ -1262,11 +1314,10 @@ debug\L2L.obj: ..\CMS2\L2L.cpp ..\CMS2\L2L.h \
 debug\sound.obj: ..\CMS2\sound.cpp ..\CMS2\sound.h
 
 debug\bst.obj: ..\CMS2\bst.cpp ..\CMS2\bst.h \
-		..\CMS2\globals.h \
 		..\CMS2\L2L.h \
-		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtGui\QList \
-		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtGui\qevent.h \
-		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtGui\qtguiglobal.h \
+		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtCore\QDebug \
+		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtCore\qdebug.h \
+		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtCore\qalgorithms.h \
 		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtCore\qglobal.h \
 		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtCore\qconfig-bootstrapped.h \
 		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtCore\qconfig.h \
@@ -1288,67 +1339,46 @@ debug\bst.obj: ..\CMS2\bst.cpp ..\CMS2\bst.h \
 		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtCore\qmutex.h \
 		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtCore\qnumeric.h \
 		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtCore\qversiontagging.h \
-		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtGui\qtgui-config.h \
-		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtGui\qwindowdefs.h \
-		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtCore\qobjectdefs.h \
-		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtCore\qnamespace.h \
-		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtCore\qobjectdefs_impl.h \
-		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtGui\qwindowdefs_win.h \
-		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtGui\qregion.h \
-		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtCore\qrect.h \
-		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtCore\qmargins.h \
-		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtCore\qsize.h \
-		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtCore\qpoint.h \
-		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtCore\qdatastream.h \
-		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtCore\qscopedpointer.h \
-		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtCore\qiodevice.h \
-		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtCore\qobject.h \
-		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtCore\qstring.h \
+		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtCore\qhash.h \
 		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtCore\qchar.h \
-		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtCore\qbytearray.h \
+		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtCore\qiterator.h \
+		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtCore\qlist.h \
 		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtCore\qrefcount.h \
 		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtCore\qarraydata.h \
+		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtCore\qhashfunctions.h \
+		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtCore\qstring.h \
+		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtCore\qbytearray.h \
+		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtCore\qnamespace.h \
 		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtCore\qstringliteral.h \
 		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtCore\qstringalgorithms.h \
 		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtCore\qstringview.h \
 		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtCore\qstringbuilder.h \
-		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtCore\qlist.h \
-		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtCore\qalgorithms.h \
-		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtCore\qiterator.h \
-		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtCore\qhashfunctions.h \
 		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtCore\qpair.h \
 		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtCore\qbytearraylist.h \
 		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtCore\qstringlist.h \
 		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtCore\qregexp.h \
 		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtCore\qstringmatcher.h \
+		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtCore\qmap.h \
+		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtCore\qtextstream.h \
+		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtCore\qiodevice.h \
+		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtCore\qobject.h \
+		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtCore\qobjectdefs.h \
+		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtCore\qobjectdefs_impl.h \
 		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtCore\qcoreevent.h \
+		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtCore\qscopedpointer.h \
 		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtCore\qmetatype.h \
 		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtCore\qvarlengtharray.h \
 		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtCore\qcontainerfwd.h \
 		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtCore\qobject_impl.h \
-		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtGui\qkeysequence.h \
-		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtCore\qvariant.h \
-		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtCore\qmap.h \
-		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtCore\qdebug.h \
-		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtCore\qhash.h \
-		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtCore\qtextstream.h \
 		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtCore\qlocale.h \
+		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtCore\qvariant.h \
 		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtCore\qshareddata.h \
 		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtCore\qvector.h \
+		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtCore\qpoint.h \
 		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtCore\qset.h \
 		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtCore\qcontiguouscache.h \
 		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtCore\qsharedpointer.h \
-		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtCore\qsharedpointer_impl.h \
-		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtCore\qurl.h \
-		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtCore\qurlquery.h \
-		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtCore\qfile.h \
-		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtCore\qfiledevice.h \
-		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtGui\qvector2d.h \
-		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtGui\qtouchdevice.h \
-		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtCore\QString \
-		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtSerialPort\QSerialPort \
-		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtSerialPort\qserialport.h \
-		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtSerialPort\qserialportglobal.h
+		C:\Qt\Qt5.11.2\5.11.2\msvc2015\include\QtCore\qsharedpointer_impl.h
 
 debug\moc_mainwindow.obj: debug\moc_mainwindow.cpp 
 

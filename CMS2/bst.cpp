@@ -3,9 +3,9 @@
 #include <stdlib.h>
 #include <QDebug>
 
-struct Leaf* initBST(int item) {
+struct Leaf* initBST(int newKey, void* data) {
     struct Leaf* temp = new Leaf;
-    temp->key = item;
+    temp->key = newKey;
     temp->left = temp->right = NULL;
     return temp;
 }
@@ -20,14 +20,14 @@ void traverseBST(struct Leaf *root) {
     }
 }
 
-struct Leaf* insertToBST(struct Leaf* n, int key) {
-    if (n == NULL) return initBST(key);
+struct Leaf* insertToBST(struct Leaf* n, int key, void* data) {
+    if (n == NULL) return initBST(key, data);
 
     if (key <= n->key) {
-        n->left = insertToBST(n->left, key);
+        n->left = insertToBST(n->left, key, data);
     }
     else if (key > n->key) {
-        n->right = insertToBST(n->right, key);
+        n->right = insertToBST(n->right, key, data);
     }
 
     return n;

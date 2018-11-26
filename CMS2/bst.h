@@ -11,11 +11,11 @@ struct Leaf {
     struct Leaf *right, *left;
 };
 
-struct Leaf* initBST(int item);
+struct Leaf* initBST(int newKey, void* data);
 
 void traverseBST(struct Leaf *root);
 
-struct Leaf* insertToBST(struct Leaf* n, int key);
+struct Leaf* insertToBST(struct Leaf* n, int key, void* data);
 
 struct Leaf* searchBST(struct Leaf* root, int key);
 

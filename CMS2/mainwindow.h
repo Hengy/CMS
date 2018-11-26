@@ -26,6 +26,8 @@ private slots:
 
     unsigned long getTime();
 
+    void refreshListHelper(struct Leaf* root, int* n);
+
     void refreshList();
 
     unsigned char checksum(unsigned char *, size_t);

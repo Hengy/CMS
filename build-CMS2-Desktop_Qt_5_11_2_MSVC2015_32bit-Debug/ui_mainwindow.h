@@ -81,6 +81,8 @@ public:
     QLabel *label_12;
     QLabel *label_14;
     QComboBox *sPriorityBox;
+    QLabel *label_16;
+    QLabel *sendMsgCount;
     QWidget *setTab;
     QSlider *recLenSlider;
     QComboBox *recBitrateBox;
@@ -167,7 +169,7 @@ public:
         label_15->setGeometry(QRect(30, 25, 81, 16));
         treeCount = new QLabel(recGroup);
         treeCount->setObjectName(QStringLiteral("treeCount"));
-        treeCount->setGeometry(QRect(120, 20, 47, 26));
+        treeCount->setGeometry(QRect(120, 20, 51, 26));
         QFont font;
         font.setPointSize(14);
         treeCount->setFont(font);
@@ -269,6 +271,13 @@ public:
         sPriorityBox = new QComboBox(sendTab);
         sPriorityBox->setObjectName(QStringLiteral("sPriorityBox"));
         sPriorityBox->setGeometry(QRect(80, 335, 61, 22));
+        label_16 = new QLabel(sendTab);
+        label_16->setObjectName(QStringLiteral("label_16"));
+        label_16->setGeometry(QRect(286, 240, 91, 20));
+        sendMsgCount = new QLabel(sendTab);
+        sendMsgCount->setObjectName(QStringLiteral("sendMsgCount"));
+        sendMsgCount->setGeometry(QRect(373, 237, 31, 26));
+        sendMsgCount->setFont(font);
         sendTabWidget->addTab(sendTab, QString());
         setTab = new QWidget();
         setTab->setObjectName(QStringLiteral("setTab"));
@@ -466,6 +475,8 @@ public:
 
         label_12->setText(QApplication::translate("MainWindow", "Send To:", nullptr));
         label_14->setText(QApplication::translate("MainWindow", "Priority:", nullptr));
+        label_16->setText(QApplication::translate("MainWindow", "Message length:", nullptr));
+        sendMsgCount->setText(QApplication::translate("MainWindow", "0", nullptr));
         sendTabWidget->setTabText(sendTabWidget->indexOf(sendTab), QApplication::translate("MainWindow", "Send Messages", nullptr));
         recBitrateBox->setItemText(0, QApplication::translate("MainWindow", "8 bps", nullptr));
         recBitrateBox->setItemText(1, QApplication::translate("MainWindow", "16 bps", nullptr));

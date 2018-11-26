@@ -4,6 +4,7 @@
 #include "L2L.h"
 #include "sound.h"
 #include <string.h>
+#include "bst.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -99,10 +100,39 @@ unsigned long MainWindow::getTime() {
    return (unsigned long)seconds;
 }
 
+void MainWindow::refreshListHelper(struct Leaf* root, int* n) {
+    if (root != NULL) {
+        traverseBST(root->left);
+
+        //qDebug() << "Key: " << root->key;
+
+        (*n)++;
+
+        QString labelStr;
+
+        labelStr = QString("%1   Key: %2").arg(QString::number(*n), QString::number(root->key));
+
+        ui->recMsgList->addItem(QString(root->key));
+
+        traverseBST(root->right);
+    }
+}
+
 void MainWindow::refreshList() {
     int treeSize = sizeOfBST(recMsgTreePri);
     qDebug() << "Tree size: " << treeSize;
     ui->treeCount->setText(QString::number(treeSize));
+
+    ui->recMsgList->clear();
+
+    int* n;
+    *n = 0;
+
+    if (sortOrder) {    // priority
+        refreshListHelper(recMsgTreePri, n);
+    } else {
+        refreshListHelper(recMsgTreeTime, n);
+    }
 }
 
 // checksum function: returns checksum (8bit). Returns 0 if there is a valid checksum at end
@@ -230,26 +260,31 @@ const char * MainWindow::readData() {
                             newRHead->checkSum = 0;
                         }
                     }
+
+                    //                    insertToBST(recMsgTreePri, newRHead->priority, newRecMsg);
+                    //                    insertToBST(recMsgTreeTime, (int)newRHead->timestamp, newRecMsg);
+
+                    // add message to trees
+                    if (recMsgTreePri == NULL) {
+                        recMsgTreePri = initBST(newRHead->priority, newRecMsg);      // priority sorted
+                        recMsgTreeTime = initBST((int)newRHead->timestamp, newRecMsg);     // time sorted
+                    } else {
+                        insertToBST(recMsgTreePri, newRHead->priority, newRecMsg);   // priority sorted
+                        insertToBST(recMsgTreeTime, (int)newRHead->timestamp, newRecMsg);  // time sorted
+                    }
                 }
 
 
-                tempData = data.data();
-                QString labelStr;
-                if (newRHead->type) {
-                    labelStr = QString("Priority: %1   Timestamp: %2   Reciever: %3   Sender: %4   Size: %5   Text: \"%6\"").arg(QString::number(newRHead->priority), QString::number((int)newRHead->timestamp), QString::number((int)newRHead->recAddr), QString::number((int)newRHead->sendAddr), QString::number((int)newRHead->dataLen-1), tempData+sizeof(Header) + 1);
-                } else {
-                    labelStr = QString("Priority: %1   Timestamp: %2   Reciever: %3   Sender: %4   Size: %5").arg(QString::number(newRHead->priority), QString::number((int)newRHead->timestamp), QString::number((int)newRHead->recAddr), QString::number((int)newRHead->sendAddr), QString::number((int)newRHead->dataLen-1));
-                }
-                ui->recMsgList->addItem(labelStr);
+//                tempData = data.data();
+//                QString labelStr;
+//                if (newRHead->type) {
+//                    labelStr = QString("Priority: %1   Timestamp: %2   Reciever: %3   Sender: %4   Size: %5   Text: \"%6\"").arg(QString::number(newRHead->priority), QString::number((int)newRHead->timestamp), QString::number((int)newRHead->recAddr), QString::number((int)newRHead->sendAddr), QString::number((int)newRHead->dataLen-1), tempData+sizeof(Header) + 1);
+//                } else {
+//                    labelStr = QString("Priority: %1   Timestamp: %2   Reciever: %3   Sender: %4   Size: %5").arg(QString::number(newRHead->priority), QString::number((int)newRHead->timestamp), QString::number((int)newRHead->recAddr), QString::number((int)newRHead->sendAddr), QString::number((int)newRHead->dataLen-1));
+//                }
+//                ui->recMsgList->addItem(labelStr);
 
-                // add message to trees
-                if (recMsgTreePri == NULL) {
-                    recMsgTreePri = initBST(newRHead->priority);      // priority sorted
-                    recMsgTreeTime = initBST((int)newRHead->timestamp);     // time sorted
-                } else {
-                    insertToBST(recMsgTreePri, newRHead->priority);   // priority sorted
-                    insertToBST(recMsgTreeTime, (int)newRHead->timestamp);  // time sorted
-                }
+
 
 //                qDebug() << "Priority sorted: ";
 //                traverseBST(recMsgTreePri);
@@ -638,7 +673,4 @@ void MainWindow::on_textMsg_textChanged()
 {
     int charCount = ui->textMsg->toPlainText().length();
     ui->sendMsgCount->setText(QString::number(charCount));
-    if (charCount > 139) {
-        ui->textMsg->
-    }
 }
