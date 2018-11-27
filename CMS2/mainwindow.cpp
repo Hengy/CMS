@@ -5,6 +5,7 @@
 #include "sound.h"
 #include <string.h>
 #include "bst.h"
+#include "rle.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -100,9 +101,30 @@ unsigned long MainWindow::getTime() {
    return (unsigned long)seconds;
 }
 
-int MainWindow::majority(char * data, int size, int n) {
+short MainWindow::majority(short* data, int n) {
 
+    int maxCount = 0;
+    int index = -1;
+    short temp = 0;
 
+    for (int i=0; i<n; i++) {
+        int count = 0;
+        for (int j=0; j<n; j++) {
+            if (data[i] = data[j]) {
+                count++;
+            }
+
+            if (count > maxCount) {
+                maxCount = count;
+                index = i;
+                temp = data[i];
+            }
+        }
+    }
+
+    if (maxCount > n/2) {
+        return temp;
+    }
 
     return 0;
 }
@@ -251,8 +273,13 @@ const char * MainWindow::readData() {
                 } else if ((newRHead->type & 0x0F) < 0x0E){ // if type is valid & size of data is greater than 140
                     newRHead->type = 0;  // audio
                 } else {
+                    qDebug() << "Type ERROR!";
                     typeErr = 1;
                 }
+
+                short settings = majority(newRHead->compEncrpyt, 3);
+
+                qDebug() << "Settings: " << settings;
 
                 if (!typeErr) {
                     Msg* newRMsg = new Msg;
@@ -286,15 +313,6 @@ const char * MainWindow::readData() {
                         insertToBST(recMsgTreeTime, (int)newRHead->timestamp, newRecMsg);  // time sorted
                     }
                 }
-
-//                tempData = data.data();
-//                QString labelStr;
-//                if (newRHead->type) {
-//                    labelStr = QString("Priority: %1   Timestamp: %2   Reciever: %3   Sender: %4   Size: %5   Text: \"%6\"").arg(QString::number(newRHead->priority), QString::number((int)newRHead->timestamp), QString::number((int)newRHead->recAddr), QString::number((int)newRHead->sendAddr), QString::number((int)newRHead->dataLen-1), tempData+sizeof(Header) + 1);
-//                } else {
-//                    labelStr = QString("Priority: %1   Timestamp: %2   Reciever: %3   Sender: %4   Size: %5").arg(QString::number(newRHead->priority), QString::number((int)newRHead->timestamp), QString::number((int)newRHead->recAddr), QString::number((int)newRHead->sendAddr), QString::number((int)newRHead->dataLen-1));
-//                }
-//                ui->recMsgList->addItem(labelStr);
 
                 refreshList();
             }
@@ -670,4 +688,20 @@ void MainWindow::on_textMsg_textChanged()
 {
     int charCount = ui->textMsg->toPlainText().length();
     ui->sendMsgCount->setText(QString::number(charCount));
+}
+
+void MainWindow::on_RELcheck_released()
+{
+    if (ui->RELcheck->checkState()) {
+        ui->HuffCheck->setChecked(0);
+        compress = 1;
+    }
+}
+
+void MainWindow::on_HuffCheck_released()
+{
+    if (ui->HuffCheck->checkState()) {
+        ui->RELcheck->setChecked(0);
+        compress = 2;
+    }
 }

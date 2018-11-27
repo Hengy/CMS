@@ -26,7 +26,7 @@ private slots:
 
     unsigned long getTime();
 
-    int majority(char * data, int size, int n);
+    short majority(short * data, int n);
 
     void refreshListHelper(struct Leaf* l, int* n);
 
@@ -83,6 +83,10 @@ private slots:
     void on_timeRadioButton_released();
 
     void on_textMsg_textChanged();
+
+    void on_RELcheck_released();
+
+    void on_HuffCheck_released();
 
 private:
     Ui::MainWindow *ui;

@@ -29,7 +29,8 @@ SOURCES += \
         mainwindow.cpp \
     L2L.cpp \
     sound.cpp \
-    bst.cpp
+    bst.cpp \
+    rle.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -37,7 +38,8 @@ HEADERS += \
     L2L.h \
     mainwindow.h \
     sound.h \
-    bst.h
+    bst.h \
+    rle.h
 
 FORMS += \
         mainwindow.ui \

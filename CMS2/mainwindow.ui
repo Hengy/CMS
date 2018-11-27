@@ -887,7 +887,7 @@
       <string>Encryption</string>
      </property>
     </widget>
-    <widget class="QCheckBox" name="enCompress">
+    <widget class="QCheckBox" name="HuffCheck">
      <property name="geometry">
       <rect>
        <x>20</x>
@@ -943,7 +943,7 @@
       <string>ID:</string>
      </property>
     </widget>
-    <widget class="QCheckBox" name="enCompress_2">
+    <widget class="QCheckBox" name="RELcheck">
      <property name="geometry">
       <rect>
        <x>20</x>
