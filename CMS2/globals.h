@@ -31,7 +31,7 @@ typedef struct Header {
     unsigned char sendAddr;                     // sender address; address of the sending computer
     unsigned long dataLen;                      // length of data in BYTES
     unsigned char sampleRate = 8;
-    short compEncrpyt[6] = {0x0101,0x0101,0x0101};     // parameters of compression and encryption
+    short compEncrpyt[6] = {0x0101,0x0555,0x0555};     // parameters of compression and encryption
     unsigned int timestamp = 0;
     unsigned char checkSum;                     // checksum of message (including header)
 } header;

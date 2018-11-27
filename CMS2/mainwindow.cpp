@@ -6,6 +6,7 @@
 #include <string.h>
 #include "bst.h"
 #include "rle.h"
+#include <QMessageBox>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -703,5 +704,57 @@ void MainWindow::on_HuffCheck_released()
     if (ui->HuffCheck->checkState()) {
         ui->RELcheck->setChecked(0);
         compress = 2;
+    }
+}
+
+Leaf* MainWindow::recViewHelper(Leaf* l, int* n, int j) {
+    if (l != NULL) {
+        recViewHelper(l->left, n, j);
+
+        (*n)++;
+
+        if (*n == j) {
+            return l;
+        }
+
+        if (*n > j) {
+            return NULL;
+        }
+
+        recViewHelper(l->right, n, j);
+    }
+}
+
+void MainWindow::on_bttnRecView_released()
+{
+    int msgIndex = ui->recMsgList->currentRow();
+
+    qDebug() << "Selected index: " << msgIndex;
+
+    int n = 0;
+    int* p = &n;
+
+     Leaf* selMsg;
+
+    if (sortOrder) {
+        selMsg = recViewHelper(recMsgTreePri, p, msgIndex+1);
+    } else {
+        selMsg = recViewHelper(recMsgTreePri, p, msgIndex+1);
+    }
+
+    RecMsg* tempRecMsg = (RecMsg *)malloc(sizeof(RecMsg));
+    memcpy(tempRecMsg, selMsg->data, sizeof(RecMsg));
+
+    int msgType = tempRecMsg->head->type;
+
+    if (msgType) {  // text
+        QString str;
+        str = QString("Message: %1").arg((char *)tempRecMsg->message->buf);
+
+        QMessageBox msgBox;
+        msgBox.setText(str);
+        msgBox.setStandardButtons(QMessageBox::Ok);
+        msgBox.setDefaultButton(QMessageBox::Ok);
+        msgBox.exec();
     }
 }

@@ -88,6 +88,10 @@ private slots:
 
     void on_HuffCheck_released();
 
+    Leaf* recViewHelper(Leaf* l, int* n, int j);
+
+    void on_bttnRecView_released();
+
 private:
     Ui::MainWindow *ui;
     void disableCtrls();
