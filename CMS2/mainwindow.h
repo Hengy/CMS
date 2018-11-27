@@ -26,7 +26,7 @@ private slots:
 
     unsigned long getTime();
 
-    void refreshListHelper(struct Leaf* root, int* n);
+    void refreshListHelper(struct Leaf* l, int* n);
 
     void refreshList();
 

@@ -37,8 +37,8 @@ typedef struct Header {
 } header;
 
 typedef struct RecMsg {
-    struct Msg* message;
     struct Header* head;
+    struct Msg* message;
 } RecMsg;
 
 LList * sendMsgList;

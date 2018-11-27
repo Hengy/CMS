@@ -100,38 +100,47 @@ unsigned long MainWindow::getTime() {
    return (unsigned long)seconds;
 }
 
-void MainWindow::refreshListHelper(struct Leaf* root, int* n) {
-    if (root != NULL) {
-        traverseBST(root->left);
-
-        //qDebug() << "Key: " << root->key;
+void MainWindow::refreshListHelper(struct Leaf* l, int* n) {
+    if (l != NULL) {
+        refreshListHelper(l->left, n);
 
         (*n)++;
 
+        RecMsg* tempRecMsg = (RecMsg *)malloc(sizeof(RecMsg));
+        memcpy(tempRecMsg, l->data, sizeof(RecMsg));
+
         QString labelStr;
 
-        labelStr = QString("%1   Key: %2").arg(QString::number(*n), QString::number(root->key));
+        if (tempRecMsg->head->type) {   // text
+            labelStr = QString("%1:\tPriority: %2\tTimestamp: %3   Recv address: %4   Send address: %5   Size: %6   Text: %7").arg(QString::number(*n), QString::number(tempRecMsg->head->priority), QString::number(tempRecMsg->head->timestamp), QString::number(tempRecMsg->head->recAddr), QString::number(tempRecMsg->head->sendAddr), QString::number(tempRecMsg->message->bufSize), (char *)tempRecMsg->message->buf);
+        } else {
+            labelStr = QString("%1:\tPriority: %2\tTimestamp: %3   Recv address: %4   Send address: %5   Size: %6").arg(QString::number(*n), QString::number(tempRecMsg->head->priority), QString::number(tempRecMsg->head->timestamp), QString::number(tempRecMsg->head->recAddr), QString::number(tempRecMsg->head->sendAddr), QString::number(tempRecMsg->message->bufSize));
+        }
 
-        ui->recMsgList->addItem(QString(root->key));
+        //qDebug() << labelStr;
 
-        traverseBST(root->right);
+        ui->recMsgList->addItem(labelStr);
+
+        refreshListHelper(l->right, n);
     }
 }
 
 void MainWindow::refreshList() {
     int treeSize = sizeOfBST(recMsgTreePri);
-    qDebug() << "Tree size: " << treeSize;
+    //qDebug() << "Tree size: " << treeSize;
     ui->treeCount->setText(QString::number(treeSize));
 
     ui->recMsgList->clear();
 
-    int* n;
-    *n = 0;
+    int n = 0;
+    int *p = &n;
 
-    if (sortOrder) {    // priority
-        refreshListHelper(recMsgTreePri, n);
-    } else {
-        refreshListHelper(recMsgTreeTime, n);
+    if (treeSize > 0) {
+        if (sortOrder) {    // priority
+            refreshListHelper(recMsgTreePri, p);
+        } else {
+            refreshListHelper(recMsgTreeTime, p);
+        }
     }
 }
 
@@ -184,11 +193,11 @@ void MainWindow::writeData(Msg * m)
 
     Header * mHeader = createHeader(m, priority, ID, thisID);
 
-    qDebug() << "Buffer size: " << m->bufSize + sizeof(*mHeader);
+    //qDebug() << "Buffer size: " << m->bufSize + sizeof(*mHeader);
 
     unsigned char * dataBuf = (unsigned char *)malloc(m->bufSize + sizeof(*mHeader));
 
-    qDebug() << "mHeader size: " << sizeof(*mHeader);
+    //qDebug() << "mHeader size: " << sizeof(*mHeader);
 
     memcpy(dataBuf, mHeader, sizeof((*mHeader)));
     memcpy(dataBuf+sizeof((*mHeader))+1, m->buf, m->bufSize);
@@ -261,9 +270,6 @@ const char * MainWindow::readData() {
                         }
                     }
 
-                    //                    insertToBST(recMsgTreePri, newRHead->priority, newRecMsg);
-                    //                    insertToBST(recMsgTreeTime, (int)newRHead->timestamp, newRecMsg);
-
                     // add message to trees
                     if (recMsgTreePri == NULL) {
                         recMsgTreePri = initBST(newRHead->priority, newRecMsg);      // priority sorted
@@ -274,7 +280,6 @@ const char * MainWindow::readData() {
                     }
                 }
 
-
 //                tempData = data.data();
 //                QString labelStr;
 //                if (newRHead->type) {
@@ -284,18 +289,11 @@ const char * MainWindow::readData() {
 //                }
 //                ui->recMsgList->addItem(labelStr);
 
-
-
-//                qDebug() << "Priority sorted: ";
-//                traverseBST(recMsgTreePri);
-//                qDebug() << "Time sorted: ";
-//                traverseBST(recMsgTreeTime);
-
                 refreshList();
             }
         }
 
-        m_serial->clear(QSerialPort::AllDirections);
+        //m_serial->clear(QSerialPort::AllDirections);
         return data.data();
 
     }
@@ -660,6 +658,8 @@ void MainWindow::on_priRadioButton_released()
     ui->timeRadioButton->setChecked(false);
     ui->priRadioButton->setChecked(true);
     sortOrder = 1;  // priority
+
+    refreshList();
 }
 
 void MainWindow::on_timeRadioButton_released()
@@ -667,6 +667,8 @@ void MainWindow::on_timeRadioButton_released()
     ui->timeRadioButton->setChecked(true);
     ui->priRadioButton->setChecked(false);
     sortOrder = 0;  // time
+
+    refreshList();
 }
 
 void MainWindow::on_textMsg_textChanged()

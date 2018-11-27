@@ -7,6 +7,7 @@ struct Leaf* initBST(int newKey, void* data) {
     struct Leaf* temp = new Leaf;
     temp->key = newKey;
     temp->left = temp->right = NULL;
+    temp->data = data;
     return temp;
 }
 
