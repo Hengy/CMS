@@ -26,6 +26,8 @@ private slots:
 
     unsigned long getTime();
 
+    int majority(char * data, int size, int n);
+
     void refreshListHelper(struct Leaf* l, int* n);
 
     void refreshList();
@@ -69,10 +71,6 @@ private slots:
     void on_bttnSaveText_released();
 
     void on_bttnSendMsg_released();
-
-    void on_sendRecList_currentRowChanged(int currentRow);
-
-    void on_actionTest_1_triggered();
 
     void on_timeoutDropbox_currentIndexChanged(int index);
 

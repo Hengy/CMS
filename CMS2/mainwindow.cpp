@@ -100,6 +100,13 @@ unsigned long MainWindow::getTime() {
    return (unsigned long)seconds;
 }
 
+int MainWindow::majority(char * data, int size, int n) {
+
+
+
+    return 0;
+}
+
 void MainWindow::refreshListHelper(struct Leaf* l, int* n) {
     if (l != NULL) {
         refreshListHelper(l->left, n);
@@ -576,23 +583,11 @@ void MainWindow::on_bttnSendMsg_released()
 
     Link * tempLink = lTraverse(sendMsgList, selAMsg);
     Msg * tempMsg = (Msg *)tempLink->data;
-    //Msg * tempMsg = new Msg;
-    //memcpy(tempMsg, tempLink->data, sizeof(tempLink->data));
-    //(Msg *)tempLink->data;
 
-    qDebug() << "Write size: " << tempMsg->bufSize;
-    qDebug() << "Text: " << (char *)tempMsg->buf;
+//    qDebug() << "Write size: " << tempMsg->bufSize;
+//    qDebug() << "Text: " << (char *)tempMsg->buf;
 
     writeData(tempMsg);
-}
-
-void MainWindow::on_sendRecList_currentRowChanged(int currentRow)
-{
-}
-
-void MainWindow::on_actionTest_1_triggered()
-{
-
 }
 
 void MainWindow::on_timeoutDropbox_currentIndexChanged(int index)
