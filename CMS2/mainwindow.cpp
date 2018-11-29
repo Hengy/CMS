@@ -7,6 +7,8 @@
 #include "bst.h"
 #include "rle.h"
 #include <QMessageBox>
+#include <QSpacerItem>
+#include <QGridLayout>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -598,7 +600,7 @@ void MainWindow::on_bttnSendMsg_released()
 {
     int selAMsg = ui->sendRecList->currentRow();
 
-    qDebug() << selAMsg;
+    qDebug() << "mesg index: " << selAMsg;
 
     Link * tempLink = lTraverse(sendMsgList, selAMsg);
     Msg * tempMsg = (Msg *)tempLink->data;
@@ -708,53 +710,60 @@ void MainWindow::on_HuffCheck_released()
 }
 
 Leaf* MainWindow::recViewHelper(Leaf* l, int* n, int j) {
+    Leaf* temp = NULL;
+
     if (l != NULL) {
-        recViewHelper(l->left, n, j);
+
+        temp = recViewHelper(l->left, n, j);
 
         (*n)++;
 
         if (*n == j) {
-            return l;
+            temp = l;
         }
 
-        if (*n > j) {
-            return NULL;
+        if (temp == NULL) {
+            temp = recViewHelper(l->right, n, j);
         }
-
-        recViewHelper(l->right, n, j);
     }
+    return temp;
 }
 
 void MainWindow::on_bttnRecView_released()
 {
-    int msgIndex = ui->recMsgList->currentRow();
+    int msgIndex = ui->recMsgList->currentRow() + 1;
 
-    qDebug() << "Selected index: " << msgIndex;
+    //qDebug() << "Selected index: " << msgIndex;
 
     int n = 0;
     int* p = &n;
 
-     Leaf* selMsg;
+    Leaf* selMsg;
 
     if (sortOrder) {
-        selMsg = recViewHelper(recMsgTreePri, p, msgIndex+1);
+        selMsg = recViewHelper(recMsgTreePri, p, msgIndex);
     } else {
-        selMsg = recViewHelper(recMsgTreePri, p, msgIndex+1);
+        selMsg = recViewHelper(recMsgTreePri, p, msgIndex);
     }
 
-    RecMsg* tempRecMsg = (RecMsg *)malloc(sizeof(RecMsg));
-    memcpy(tempRecMsg, selMsg->data, sizeof(RecMsg));
+    if (selMsg != NULL) {
+        RecMsg* tempRecMsg = (RecMsg *)malloc(sizeof(RecMsg));
+        memcpy(tempRecMsg, selMsg->data, sizeof(RecMsg));
 
-    int msgType = tempRecMsg->head->type;
+        int msgType = tempRecMsg->head->type;
 
-    if (msgType) {  // text
-        QString str;
-        str = QString("Message: %1").arg((char *)tempRecMsg->message->buf);
+        if (msgType) {  // text
+            QString str;
+            str = QString("Message: %1").arg((char *)tempRecMsg->message->buf);
 
-        QMessageBox msgBox;
-        msgBox.setText(str);
-        msgBox.setStandardButtons(QMessageBox::Ok);
-        msgBox.setDefaultButton(QMessageBox::Ok);
-        msgBox.exec();
+            QMessageBox msgBox;
+            QSpacerItem* hSpacer = new QSpacerItem(400, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
+            QGridLayout* layout = (QGridLayout*)msgBox.layout();
+            layout->addItem(hSpacer, layout->rowCount(), 0, 1, layout->columnCount());
+            msgBox.setText(str);
+            msgBox.setStandardButtons(QMessageBox::Ok);
+            msgBox.setDefaultButton(QMessageBox::Ok);
+            msgBox.exec();
+        }
     }
 }

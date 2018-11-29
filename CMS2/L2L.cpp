@@ -102,7 +102,7 @@ Link * lPopStart(LList * l) {
 
 // traverse helper
 Link * lTraverseHelper(Link * n, int i, int j) {
-    if ((i <= j) && (n->next != NULL)) {
+    if ((i < j) && (n->next != NULL)) {
         return lTraverseHelper(n->next, i++, j);
     }
     return n;
@@ -111,6 +111,6 @@ Link * lTraverseHelper(Link * n, int i, int j) {
 // traverse list and return node
 Link * lTraverse(LList * l, int j) {
     struct node * temp = new Link;
-    temp = lTraverseHelper(l->head, 0, j+1);
+    temp = lTraverseHelper(l->head->next, 0, j);
     return temp;
 }
