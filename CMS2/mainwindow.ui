@@ -819,32 +819,32 @@
      </property>
      <item>
       <property name="text">
-       <string>500</string>
+       <string>250</string>
       </property>
      </item>
      <item>
       <property name="text">
-       <string>1000</string>
+       <string>5000</string>
       </property>
      </item>
      <item>
       <property name="text">
-       <string>1500</string>
+       <string>10000</string>
       </property>
      </item>
      <item>
       <property name="text">
-       <string>2000</string>
+       <string>25000</string>
       </property>
      </item>
      <item>
       <property name="text">
-       <string>2500</string>
+       <string>50000</string>
       </property>
      </item>
      <item>
       <property name="text">
-       <string>3000</string>
+       <string>100000</string>
       </property>
      </item>
     </widget>
@@ -997,6 +997,8 @@
      <string>Testing</string>
     </property>
     <addaction name="actionBER_Test"/>
+    <addaction name="actionFill_send_list"/>
+    <addaction name="actionFill_receive_list"/>
    </widget>
    <addaction name="menuCMS"/>
    <addaction name="menuMessage"/>
@@ -1069,6 +1071,16 @@
   <action name="actionBER_Test">
    <property name="text">
     <string>BER Test</string>
+   </property>
+  </action>
+  <action name="actionFill_send_list">
+   <property name="text">
+    <string>Fill send list</string>
+   </property>
+  </action>
+  <action name="actionFill_receive_list">
+   <property name="text">
+    <string>Fill receive list</string>
    </property>
   </action>
  </widget>

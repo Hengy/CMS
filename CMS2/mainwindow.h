@@ -38,6 +38,12 @@ private slots:
 
     void writeData(struct Msg *);
 
+    void testLoadRecvMsgs();
+
+    void testLoadSendMsgs();
+
+    void testBER(const char*);
+
     const char * readData();
 
     void closeSerialPort();
@@ -99,6 +105,10 @@ private slots:
     Leaf* recreateBST(Leaf* l);
 
     void on_bttnRecDel_released();
+
+    void on_actionFill_send_list_triggered();
+
+    void on_actionFill_receive_list_triggered();
 
 private:
     Ui::MainWindow *ui;

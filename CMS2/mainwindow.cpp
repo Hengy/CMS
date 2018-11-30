@@ -235,14 +235,122 @@ void MainWindow::writeData(Msg * m)
     memcpy(dataBuf, mHeader, sizeof((*mHeader)));
     memcpy(dataBuf+sizeof((*mHeader))+1, m->buf, m->bufSize);
 
+    qDebug() << "Sending!";
+
     QByteArray sendData;
     sendData.setRawData((char *)dataBuf, m->bufSize + sizeof(*mHeader));
     m_serial->write(sendData);
+
+    qDebug() << sendData;
+}
+
+void MainWindow::testLoadRecvMsgs() {
+    for (int i=0; i<4; i++) {
+        Msg * newMsg = new Msg;
+        newMsg->type = 1;
+
+        int newBufSize = (rand() % 36) + 4;
+
+        char * newBuf = (char *)malloc(newBufSize);
+
+        for (int j=0; j<(newBufSize-1); j++) {
+            memset(newBuf+j, (char)((rand() % 90) + 31), 1);
+        }
+        memset(newBuf+newBufSize-2, '\0', 1);
+
+        qDebug() << *newBuf;
+
+        newMsg->buf = (char *)malloc(newBufSize);
+        memcpy((char *)newMsg->buf, newBuf, newBufSize);
+
+        newMsg->bufSize = newBufSize;
+
+        Header * newHeader = new Header;
+        newHeader->priority = (unsigned char)(rand() % 254);
+        newHeader->recAddr = (unsigned char)(rand() % 254);
+        newHeader->sendAddr = (unsigned char)(rand() % 254);
+        newHeader->timestamp = (unsigned int)(rand() % 254);
+
+        RecMsg* newRecMsg = new RecMsg;
+        newRecMsg->head = newHeader;
+        newRecMsg->message = newMsg;
+
+        if (recMsgTreePri == NULL) {
+            recMsgTreePri = initBST(newHeader->priority, newRecMsg);      // priority sorted
+            recMsgTreeTime = initBST((int)newHeader->timestamp, newRecMsg);     // time sorted
+        } else {
+            insertToBST(recMsgTreePri, newHeader->priority, newRecMsg);   // priority sorted
+            insertToBST(recMsgTreeTime, (int)newHeader->timestamp, newRecMsg);  // time sorted
+        }
+
+        QString labelStr;
+
+        refreshList();
+    }
+}
+
+void MainWindow::testLoadSendMsgs() {
+    for (int i=0; i<4; i++) {
+        Msg * newMsg = new Msg;
+        newMsg->type = 1;
+
+        int newBufSize = (rand() % 36) + 4;
+
+        char * newBuf = (char *)malloc(newBufSize);
+
+        for (int j=0; j<(newBufSize-1); j++) {
+            memset(newBuf+j, (char)((rand() % 90) + 31), 1);
+        }
+        memset(newBuf+newBufSize-2, '\0', 1);
+
+        qDebug() << *newBuf;
+
+        newMsg->buf = (char *)malloc(newBufSize);
+        memcpy((char *)newMsg->buf, newBuf, newBufSize);
+
+        newMsg->bufSize = newBufSize;
+
+        lPushToEnd(sendMsgList, newMsg, sizeof(Msg));
+
+        QString labelStr;
+
+        labelStr = QString("Size: %1   Text: %2").arg(QString::number(newMsg->bufSize), newBuf);
+
+        ui->sendRecList->addItem(labelStr);
+    }
+}
+
+void MainWindow::testBER(const char * data) {
+
+    int errors = 0;
+    for (int i=0; i<19; i++) {
+        for (int j=0; j<8; j++) {
+            //qDebug() << "Compare: " << (data[i] & (0x01 << j)) << ":" << (BERarray[i] & (0x01 << j));
+            if ((data[i] & (0x01 << j)) != (BERarray[i] & (0x01 << j))) {
+                errors++;
+            }
+        }
+    }
+
+    double BER = (double)errors/160;
+    //qDebug() << "Bit Error Rate test: " << BER << "%";
+
+    QString str;
+    str = QString("Bit Error Rate test: %1%").arg(BER);
+
+    QMessageBox msgBox;
+    QSpacerItem* hSpacer = new QSpacerItem(400, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
+    QGridLayout* layout = (QGridLayout*)msgBox.layout();
+    layout->addItem(hSpacer, layout->rowCount(), 0, 1, layout->columnCount());
+    msgBox.setText(str);
+    msgBox.setStandardButtons(QMessageBox::Ok);
+    msgBox.setDefaultButton(QMessageBox::Ok);
+    msgBox.exec();
 }
 
 const char * MainWindow::readData() {
     //m_serial->waitForReadyRead(1000);
-    m_serial->waitForBytesWritten(160);
+    m_serial->waitForBytesWritten(byteWaitVal);
     const QByteArray data = m_serial->readAll();
 
     const char* tempData;
@@ -250,20 +358,12 @@ const char * MainWindow::readData() {
     if (data.size() > 0) {
 
         tempData = data.data();
-        int BERtest = memcmp(tempData+21, BERarray, 4);
-        if (!BERtest) {
-            qDebug() << "Bit Error Rate test";
 
-            int errors = 0;
-            for (int i=0; i<20; i++) {
-                for (int j=0; j<8; j++) {
-                    qDebug() << "Compare: " << (tempData[i] & (0x01 << j)) << ":" << (BERarray[i] & (0x01 << j));
-                    if ((tempData[i] & (0x01 << j)) != (BERarray[i] & (0x01 << j))) {
-                        errors++;
-                    }
-                }
-            }
-            qDebug() << "BER: " << errors << "/160";
+        int BERtest = memcmp(&tempData[sizeof(Header)+1], BERarray, 4);
+        if (!BERtest) {
+
+            testBER(&tempData[sizeof(Header)+1]);
+
         } else {
             qDebug() << "Raw data: "  << data;
 
@@ -617,25 +717,25 @@ void MainWindow::on_timeoutDropbox_currentIndexChanged(int index)
 {
     switch (index) {
         case 0:
-            timeout = 500;
+            byteWaitVal = 250;
             break;
         case 1:
-            timeout = 1000;
+            byteWaitVal = 5000;
             break;
         case 2:
-            timeout = 1500;
+            byteWaitVal = 10000;
             break;
         case 3:
-            timeout = 2000;
+            byteWaitVal = 25000;
             break;
         case 4:
-            timeout = 2500;
+            byteWaitVal = 50000;
             break;
         case 5:
-            timeout = 3000;
+            byteWaitVal = 100000;
             break;
         default:
-            timeout = 2000;
+            byteWaitVal = 250;
             break;
     }
 }
@@ -845,4 +945,14 @@ void MainWindow::on_bttnRecDel_released()
     recMsgTreeTime = recreateBST(recMsgTreePri);
 
     refreshList();
+}
+
+void MainWindow::on_actionFill_send_list_triggered()
+{
+    testLoadSendMsgs();
+}
+
+void MainWindow::on_actionFill_receive_list_triggered()
+{
+    testLoadRecvMsgs();
 }

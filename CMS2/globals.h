@@ -31,7 +31,7 @@ typedef struct Header {
     unsigned char sendAddr;                     // sender address; address of the sending computer
     unsigned long dataLen;                      // length of data in BYTES
     unsigned char sampleRate = 8;
-    short compEncrpyt[6] = {0x0101,0x0555,0x0555};     // parameters of compression and encryption
+    short compEncrpyt[6] = {100,1365,1365};     // parameters of compression and encryption
     unsigned int timestamp = 0;
     unsigned char checkSum;                     // checksum of message (including header)
 } header;
@@ -55,21 +55,22 @@ int bufSize;         // buffer size in BYTES
 
 // COMM port
 QSerialPort currPort;
-int timeout = 8000;
 
 int treeCount = 0;
 
 QTimer *timer;
 
-unsigned char BERarray[20] = {0x5A, 0xA5, 0x55, 0xAA, 0x11,
-                             0x5A, 0xA5, 0x55, 0xAA, 0x11,
-                             0x5A, 0xA5, 0x55, 0xAA, 0x11,
-                             0x5A, 0xA5, 0x55, 0xAA, 0x11};
+char BERarray[20] = {0x5A, 0xA5, 0x55, 0xAA, 0x11,
+                     0x5A, 0xA5, 0x55, 0xAA, 0x11,
+                     0x5A, 0xA5, 0x55, 0xAA, 0x11,
+                     0x5A, 0xA5, 0x55, 0xAA, 0x11};
 
 int sortOrder = 1;  // (0) time recieved (1) priority
 
 unsigned long startTime = 0;
 
 int compress = 0;       // (0) no compression (1) RLE (2) Huffman
+
+int byteWaitVal = 250;
 
 #endif // GLOBALS_H
