@@ -853,12 +853,12 @@
       <rect>
        <x>210</x>
        <y>25</y>
-       <width>71</width>
+       <width>91</width>
        <height>16</height>
       </rect>
      </property>
      <property name="text">
-      <string>Timeout (ms)</string>
+      <string>Wait for (bytes):</string>
      </property>
     </widget>
    </widget>

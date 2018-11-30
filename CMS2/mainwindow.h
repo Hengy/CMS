@@ -92,6 +92,14 @@ private slots:
 
     void on_bttnRecView_released();
 
+    void on_bttnRecDetails_released();
+
+    Leaf* recreateHelper(Leaf* l, Leaf* newBST);
+
+    Leaf* recreateBST(Leaf* l);
+
+    void on_bttnRecDel_released();
+
 private:
     Ui::MainWindow *ui;
     void disableCtrls();

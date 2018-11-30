@@ -33,6 +33,7 @@ MainWindow::MainWindow(QWidget *parent) :
     for (short i=0; i<256; i+=10) {
         ui->sPriorityBox->addItem(QString::number(i));
     }
+    ui->sPriorityBox->setCurrentIndex(12);
 
     // recieved message sort order
     ui->timeRadioButton->setChecked(false);
@@ -585,12 +586,11 @@ void MainWindow::on_bttnSaveText_released()
 
         lPushToEnd(sendMsgList, newTextMsg, sizeof(Msg));
 
-        char * msgNameText = (char *)malloc(textSize+6);
+        QString labelStr;
 
-        memcpy(msgNameText+6,(char *)newTextMsg->buf,textSize);
-        memcpy(msgNameText,"Text: ", 6);
+        labelStr = QString("Size: %1   Text: %2").arg(QString::number(newTextMsg->bufSize), (char *)newTextMsg->buf);
 
-        ui->sendRecList->addItem((char *)msgNameText);
+        ui->sendRecList->addItem(labelStr);
 
         ui->textMsg->clear();
     }
@@ -600,7 +600,7 @@ void MainWindow::on_bttnSendMsg_released()
 {
     int selAMsg = ui->sendRecList->currentRow();
 
-    qDebug() << "mesg index: " << selAMsg;
+    //qDebug() << "mesg index: " << selAMsg;
 
     Link * tempLink = lTraverse(sendMsgList, selAMsg);
     Msg * tempMsg = (Msg *)tempLink->data;
@@ -609,6 +609,8 @@ void MainWindow::on_bttnSendMsg_released()
 //    qDebug() << "Text: " << (char *)tempMsg->buf;
 
     writeData(tempMsg);
+
+    ui->sPriorityBox->setCurrentIndex(12);
 }
 
 void MainWindow::on_timeoutDropbox_currentIndexChanged(int index)
@@ -743,7 +745,7 @@ void MainWindow::on_bttnRecView_released()
     if (sortOrder) {
         selMsg = recViewHelper(recMsgTreePri, p, msgIndex);
     } else {
-        selMsg = recViewHelper(recMsgTreePri, p, msgIndex);
+        selMsg = recViewHelper(recMsgTreeTime, p, msgIndex);
     }
 
     if (selMsg != NULL) {
@@ -766,4 +768,81 @@ void MainWindow::on_bttnRecView_released()
             msgBox.exec();
         }
     }
+}
+
+void MainWindow::on_bttnRecDetails_released()
+{
+    int msgIndex = ui->recMsgList->currentRow() + 1;
+
+    //qDebug() << "Selected index: " << msgIndex;
+
+    int n = 0;
+    int* p = &n;
+
+    Leaf* selMsg;
+
+    if (sortOrder) {
+        selMsg = recViewHelper(recMsgTreePri, p, msgIndex);
+    } else {
+        selMsg = recViewHelper(recMsgTreeTime, p, msgIndex);
+    }
+
+    if (selMsg != NULL) {
+        RecMsg* tempRecMsg = (RecMsg *)malloc(sizeof(RecMsg));
+        memcpy(tempRecMsg, selMsg->data, sizeof(RecMsg));
+
+        int msgType = tempRecMsg->head->type;
+
+        if (msgType) {  // text
+            QString str;
+            str = QString("Priority: %1\nTimestamp: %2\nReciever ID: %3\nSender ID: %4\nData length (bytes): %5").arg(QString::number(tempRecMsg->head->priority), QString::number(tempRecMsg->head->timestamp),QString::number(tempRecMsg->head->recAddr),QString::number(tempRecMsg->head->sendAddr),QString::number(tempRecMsg->head->dataLen));
+
+            QMessageBox msgBox;
+            QSpacerItem* hSpacer = new QSpacerItem(400, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
+            QGridLayout* layout = (QGridLayout*)msgBox.layout();
+            layout->addItem(hSpacer, layout->rowCount(), 0, 1, layout->columnCount());
+            msgBox.setText(str);
+            msgBox.setStandardButtons(QMessageBox::Ok);
+            msgBox.setDefaultButton(QMessageBox::Ok);
+            msgBox.exec();
+        }
+    }
+}
+
+Leaf* MainWindow::recreateHelper(Leaf* l, Leaf* newBST) {
+    if (l != NULL) {
+        newBST = recreateHelper(l->left, newBST);
+
+        RecMsg* tempRecMsg = (RecMsg *)malloc(sizeof(RecMsg));
+        memcpy(tempRecMsg, l->data, sizeof(RecMsg));
+
+        if (newBST == NULL) {
+            newBST = initBST(tempRecMsg->head->timestamp, l->data);
+        } else {
+            insertToBST(newBST, tempRecMsg->head->timestamp, l->data);
+        }
+
+        newBST = recreateHelper(l->right, newBST);
+    }
+
+    return newBST;
+}
+
+Leaf* MainWindow::recreateBST(Leaf* l) {
+    Leaf* newBST = NULL;
+
+    newBST = recreateHelper(l, newBST);
+
+    return newBST;
+}
+
+void MainWindow::on_bttnRecDel_released()
+{
+    int msgIndex = ui->recMsgList->currentRow() + 1;
+
+    recMsgTreePri = deleteFromBST(recMsgTreePri, msgIndex);
+
+    recMsgTreeTime = recreateBST(recMsgTreePri);
+
+    refreshList();
 }

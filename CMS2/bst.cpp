@@ -52,3 +52,34 @@ int sizeOfBST(struct Leaf* root) {
         return (sizeOfBST(root->left) + 1 + sizeOfBST(root->right));
     }
 }
+
+Leaf* deleteHelper(Leaf* l, Leaf* newBST, int* n, int j) {
+    if (l != NULL) {
+        newBST = deleteHelper(l->left, newBST, n, j);
+
+        (*n)++;
+
+        if ((*n) != j) {
+            if (newBST == NULL) {
+                newBST = initBST(l->key, l->data);
+            } else {
+                insertToBST(newBST, l->key, l->data);
+            }
+        }
+
+        newBST = deleteHelper(l->right, newBST, n, j);
+    }
+
+    return newBST;
+}
+
+Leaf* deleteFromBST(Leaf* l, int j) {
+    Leaf* newBST = NULL;
+
+    int n = 0;
+    int* p = &n;
+
+    newBST = deleteHelper(l, newBST, p, j);
+
+    return newBST;
+}

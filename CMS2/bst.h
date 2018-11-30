@@ -21,4 +21,8 @@ struct Leaf* searchBST(struct Leaf* root, int key);
 
 int sizeOfBST(struct Leaf* root);
 
+Leaf* deleteHelper(Leaf* l, Leaf* newBST, int* n, int j);
+
+Leaf* deleteFromBST(Leaf* l, int j);
+
 #endif // BST_H
