@@ -6,7 +6,26 @@
 #include <string.h>
 #include "rle.h"
 
-int RLEncode(unsigned char* in, int iInLen,	unsigned char* out, int iOutMax, unsigned char cEsc) {
+int compressRLE(unsigned char * data, unsigned char * dataOut, int max, int len) {
+    int RLEoutsz;
+    unsigned char * RLEncodeBuf;
+
+    unsigned char cEsc = FindEscC(data, len);
+
+    RLEncodeBuf = (unsigned char *)malloc(max);
+
+    RLEoutsz = RLEncode(data, len, RLEncodeBuf, max-10, cEsc);
+
+    if (RLEoutsz == -1) {
+        return -1;
+        dataOut = data;
+    } else {
+        dataOut = RLEncodeBuf;
+        return RLEoutsz;
+    }
+}
+
+int RLEncode(unsigned char* in, int iInLen,	unsigned char* out, int max, unsigned char cEsc) {
     int count;
 
     unsigned char charac;	// repeated character
@@ -44,7 +63,9 @@ int RLEncode(unsigned char* in, int iInLen,	unsigned char* out, int iOutMax, uns
         }
         i++;
 
-
+        if (strlen((const char*)out) > max) {
+            return -1;
+        }
     }
 
     return(strlen((const char*)out)); // Returns length of output
@@ -54,7 +75,7 @@ int RLEncode(unsigned char* in, int iInLen,	unsigned char* out, int iOutMax, uns
 
 
 
-int RLDecode(unsigned char *in, int iInLen, unsigned char *out, int iOutMax, unsigned char cEsc)
+int RLDecode(unsigned char *in, int iInLen, unsigned char *out, unsigned char cEsc)
 {
     int i = 0, j = 0, repeats = 0;
     unsigned char HEX[3];	// String rep of HEX number of repeats
@@ -76,7 +97,6 @@ int RLDecode(unsigned char *in, int iInLen, unsigned char *out, int iOutMax, uns
             repeats = (int)strtol((char*)HEX, NULL, 16); // repeats as num
             for(j=0;j<repeats;j++) strcat((char*)out, charac);
         }
-        if (strlen((char*)out) > iOutMax) { printf("OVERFLOW"); return 0; }
     }
     return(strlen((char*)out));  // Return length of output buffer
 }
@@ -93,11 +113,8 @@ unsigned char FindEscC(unsigned char * iBuf, int iBufLength)
 
         }
 
-
     }
 
     if (Esc == 32) return('~');					// after trying every escape charter fails. use ~ by defult
     return (Esc);								// Else return the escape character not found in array.
-
-
 }

@@ -26,7 +26,7 @@ private slots:
 
     unsigned long getTime();
 
-    short majority(short * data, int n);
+    short majority(unsigned char* data, int n);
 
     void refreshListHelper(struct Leaf* l, int* n);
 

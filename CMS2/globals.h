@@ -16,7 +16,7 @@ typedef struct Msg {
     unsigned char type; // type of message: (0) audio (1) text
     char name[20];      // name of msg
     void * buf;         // msg buffer
-    long bufSize = 0;   // size of buffer
+    long bufSize = 0;   // size of buffer (without compression)
     int bitrate;        // bitrate of message
     int samplerate;     // samplerate of message
     int len;            // length of message (in seconds)
@@ -31,7 +31,7 @@ typedef struct Header {
     unsigned char sendAddr;                     // sender address; address of the sending computer
     unsigned long dataLen;                      // length of data in BYTES
     unsigned char sampleRate = 8;
-    short compEncrpyt[6] = {100,1365,1365};     // parameters of compression and encryption
+    unsigned char compEncrpyt[3] = {0,0,0};     // parameters of compression and encryption; default no compression, no encryption
     unsigned int timestamp = 0;
     unsigned char checkSum;                     // checksum of message (including header)
 } header;

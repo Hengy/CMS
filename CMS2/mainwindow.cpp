@@ -105,7 +105,7 @@ unsigned long MainWindow::getTime() {
    return (unsigned long)seconds;
 }
 
-short MainWindow::majority(short* data, int n) {
+short MainWindow::majority(unsigned char* data, int n) {
 
     int maxCount = 0;
     int index = -1;
@@ -224,21 +224,47 @@ void MainWindow::writeData(Msg * m)
 
     unsigned char priority = ui->sPriorityBox->currentIndex() * 10;
 
-    Header * mHeader = createHeader(m, priority, ID, thisID);
+    Header * mHeader = createHeader(m, priority, ID, thisID);   // create header
 
     //qDebug() << "Buffer size: " << m->bufSize + sizeof(*mHeader);
 
-    unsigned char * dataBuf = (unsigned char *)malloc(m->bufSize + sizeof(*mHeader));
+    unsigned char * dataBuf;
 
-    //qDebug() << "mHeader size: " << sizeof(*mHeader);
+    int result = -1;
 
-    memcpy(dataBuf, mHeader, sizeof((*mHeader)));
-    memcpy(dataBuf+sizeof((*mHeader))+1, m->buf, m->bufSize);
+    if (!compress) {        // no compression
+        // header already has correct compEncrypt variable
 
-    qDebug() << "Sending!";
+        dataBuf = (unsigned char *)malloc(m->bufSize + sizeof(*mHeader));
+
+        memcpy(dataBuf, mHeader, sizeof((*mHeader)));
+        memcpy(dataBuf+sizeof((*mHeader))+1, m->buf, m->bufSize);
+
+    } else {                // RLE compression
+        unsigned char newce = 0x0F;     // set RLE compression bits
+        memset(mHeader->compEncrpyt, newce, 3);
+
+        unsigned char * compData = (unsigned char *)malloc(m->bufSize*1.5);
+
+        result = compressRLE((unsigned char *)m->buf, compData, m->bufSize*1.5, m->bufSize);
+
+        if (result == -1) {
+            qDebug() << "Compression failed!";
+        } else {
+            dataBuf = (unsigned char *)malloc(result + sizeof(*mHeader));
+
+            memcpy(dataBuf, mHeader, sizeof((*mHeader)));
+            memcpy(dataBuf+sizeof((*mHeader))+1, compData, result);
+        }
+    }
+
+
+    if (result == -1) {
+        result = m->bufSize;
+    }
 
     QByteArray sendData;
-    sendData.setRawData((char *)dataBuf, m->bufSize + sizeof(*mHeader));
+    sendData.setRawData((char *)dataBuf, result + sizeof(*mHeader));
     m_serial->write(sendData);
 
     qDebug() << sendData;
